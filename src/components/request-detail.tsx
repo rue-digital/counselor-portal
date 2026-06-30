@@ -1,0 +1,129 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatusBadge } from "@/components/portal-shell";
+import {
+  STATUSES,
+  STATUS_LABELS,
+  formatDate,
+  type AssistanceRequest,
+} from "@/lib/mock-data";
+import { cn } from "@/lib/utils";
+import { Check } from "lucide-react";
+
+interface Props {
+  request: AssistanceRequest;
+}
+
+export function RequestDetail({ request }: Props) {
+  const reachedStatuses = new Set(request.timeline.map((e) => e.status));
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-3">
+      <div className="lg:col-span-2 space-y-6">
+        <Card>
+          <CardHeader>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-xs text-muted-foreground font-mono">{request.id}</div>
+                <CardTitle className="mt-1">{request.title}</CardTitle>
+              </div>
+              <StatusBadge status={request.status} />
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm">
+            <p className="text-foreground/90 whitespace-pre-line">{request.description}</p>
+            <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t">
+              <Field label="Category" value={request.category} />
+              <Field label="Urgency" value={request.urgency} />
+              <Field label="Client" value={request.client} />
+              <Field label="Counselor" value={request.counselor} />
+              <Field label="Created" value={formatDate(request.createdAt)} />
+              <Field label="Updated" value={formatDate(request.updatedAt)} />
+            </dl>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ol className="space-y-4">
+              {[...request.timeline]
+                .sort((a, b) => a.at.localeCompare(b.at))
+                .map((evt, idx) => (
+                  <li key={idx} className="flex gap-3">
+                    <div className="flex flex-col items-center">
+                      <div className="h-2.5 w-2.5 rounded-full bg-primary mt-1.5" />
+                      {idx < request.timeline.length - 1 ? (
+                        <div className="flex-1 w-px bg-border my-1" />
+                      ) : null}
+                    </div>
+                    <div className="pb-2 flex-1">
+                      <div className="flex items-center gap-2">
+                        <StatusBadge status={evt.status} />
+                        <span className="text-xs text-muted-foreground">
+                          {formatDate(evt.at)} · {evt.actor}
+                        </span>
+                      </div>
+                      {evt.note ? (
+                        <p className="text-sm mt-1 text-foreground/80">{evt.note}</p>
+                      ) : null}
+                    </div>
+                  </li>
+                ))}
+            </ol>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Status timeline</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ol className="space-y-3">
+              {STATUSES.map((s) => {
+                const reached = reachedStatuses.has(s);
+                const current = request.status === s;
+                return (
+                  <li key={s} className="flex items-center gap-3">
+                    <div
+                      className={cn(
+                        "h-6 w-6 rounded-full border flex items-center justify-center text-xs",
+                        current
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : reached
+                            ? "bg-muted border-border text-foreground"
+                            : "border-dashed border-border text-muted-foreground",
+                      )}
+                    >
+                      {reached ? <Check className="h-3.5 w-3.5" /> : null}
+                    </div>
+                    <span
+                      className={cn(
+                        "text-sm",
+                        current ? "font-medium" : reached ? "text-foreground" : "text-muted-foreground",
+                      )}
+                    >
+                      {STATUS_LABELS[s]}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="text-xs text-muted-foreground uppercase tracking-wide">{label}</dt>
+      <dd className="mt-0.5 font-medium">{value}</dd>
+    </div>
+  );
+}
