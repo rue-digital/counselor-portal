@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { STATUS_LABELS, STATUS_STYLES, type RequestStatus } from "@/lib/mock-data";
 import {
   LayoutDashboard,
   FilePlus2,
@@ -120,8 +121,7 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
   );
 }
 
-export function StatusBadge({ status }: { status: import("@/lib/mock-data").RequestStatus }) {
-  const { STATUS_LABELS, STATUS_STYLES } = require("@/lib/mock-data");
+export function StatusBadge({ status }: { status: RequestStatus }) {
   return (
     <span
       className={cn(
