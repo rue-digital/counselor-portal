@@ -21,7 +21,7 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("arunima.tripathy@developforgood.org");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("developforgood");
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {

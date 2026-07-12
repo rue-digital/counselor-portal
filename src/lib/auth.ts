@@ -112,6 +112,7 @@ export function generatePassword(length = 16) {
   for (let i = 0; i < length; i++) {
     password += charset[randomValues[i] % charset.length];
   }
+  // all passwords are developforgood for ease of testing
   return "developforgood";
   return password;
 }
