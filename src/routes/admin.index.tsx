@@ -1,13 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PortalShell, StatusBadge } from "@/components/portal-shell";
 import { Card } from "@/components/ui/card";
-import {
-  mockRequests,
-  STATUSES,
-  STATUS_LABELS,
-  formatDate,
-  type RequestStatus,
-} from "@/lib/mock-data";
+import { STATUSES, STATUS_LABELS, formatDate, type RequestStatus } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
+import { getAllRequests, getLoggedInUserName } from "@/lib/auth";
+import type { Ticket } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({ meta: [{ title: "Request Board — Admin" }] }),
@@ -15,18 +12,45 @@ export const Route = createFileRoute("/admin/")({
 });
 
 function AdminBoardPage() {
-  const byStatus = STATUSES.reduce<Record<RequestStatus, typeof mockRequests>>(
-    (acc, s) => {
-      acc[s] = mockRequests.filter((r) => r.status === s);
-      return acc;
-    },
-    {} as Record<RequestStatus, typeof mockRequests>,
-  );
+  const [name, setName] = useState<string | null>(null);
+  const [tickets, setTickets] = useState<Ticket[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadUser() {
+      const name = await getLoggedInUserName();
+      if (name) setName(name);
+    }
+
+    async function loadDashboard() {
+      const requests = await getAllRequests();
+      setTickets(requests);
+      setLoading(false);
+    }
+
+    void loadUser();
+    void loadDashboard();
+  }, []);
+
+  let byStatus: Record<RequestStatus, Ticket[]>;
+  if (tickets) {
+    byStatus = STATUSES.reduce<Record<RequestStatus, Ticket[]>>(
+      (acc, s) => {
+        acc[s] = tickets?.filter((r) => r.status === s);
+        return acc;
+      },
+      {} as Record<RequestStatus, Ticket[]>,
+    );
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <PortalShell
       role="admin"
-      title="Request Board"
+      title={`Welcome back, ${name?.split(" ")[0]}`}
       subtitle="All counselor requests, organized by status."
     >
       <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(260px,1fr))]">
@@ -36,37 +60,34 @@ function AdminBoardPage() {
               <div className="flex items-center gap-2">
                 <StatusBadge status={status} />
                 <span className="text-xs text-muted-foreground">
-                  {byStatus[status].length}
+                  {byStatus[status].length > 0 ? byStatus[status].length : null}
                 </span>
               </div>
             </div>
             <div className="flex flex-col gap-2 rounded-lg bg-muted/40 p-2 min-h-[120px]">
               {byStatus[status].map((r) => (
-                <Link
-                  key={r.id}
-                  to="/admin/requests/$id"
-                  params={{ id: r.id }}
-                  className="block"
-                >
+                <Link key={r.id} to="/admin/requests/$id" params={{ id: r.id }} className="block">
                   <Card className="p-3 hover:shadow-sm transition-shadow">
-                    <div className="text-xs font-mono text-muted-foreground">{r.id}</div>
+                    <div className="text-xs font-mono text-muted-foreground">
+                      {"REQ-" + r.id.slice(0, 8)}
+                    </div>
                     <div className="font-medium text-sm mt-0.5 line-clamp-2">{r.title}</div>
                     <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{r.counselor}</span>
+                      {/* <span>{r.counselor}</span> */}
                       <span
                         className={
-                          r.urgency === "High"
+                          r.priority === "high"
                             ? "text-rose-600 font-medium"
-                            : r.urgency === "Medium"
+                            : r.priority === "medium"
                               ? "text-amber-600"
                               : ""
                         }
                       >
-                        {r.urgency}
+                        {r.priority}
                       </span>
                     </div>
                     <div className="mt-1 text-xs text-muted-foreground">
-                      Updated {formatDate(r.updatedAt)}
+                      Updated {formatDate(r.updated_at)}
                     </div>
                   </Card>
                 </Link>

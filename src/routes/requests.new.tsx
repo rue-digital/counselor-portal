@@ -25,11 +25,7 @@ function NewRequestPage() {
   const [submitting, setSubmitting] = useState(false);
 
   return (
-    <PortalShell
-      role="counselor"
-      title="Submit Assistance Request"
-      subtitle="Provide as much detail as possible. Mock submission only — nothing is stored."
-    >
+    <PortalShell role="counselor" title="Submit Assistance Request">
       <Card className="max-w-3xl">
         <CardHeader>
           <CardTitle className="text-base">Request details</CardTitle>
@@ -54,23 +50,8 @@ function NewRequestPage() {
                 <Input id="title" required placeholder="Brief summary of the request" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="client">Client name</Label>
-                <Input id="client" required placeholder="e.g. A. Nguyen" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Select defaultValue="Financial">
-                  <SelectTrigger id="category">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {["Financial", "Academic", "Housing", "Mental Health", "Other"].map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="identifier">Family reference code</Label>
+                <Input id="identifier" required placeholder="e.g. A. Nguyen" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="urgency">Urgency</Label>
@@ -79,7 +60,7 @@ function NewRequestPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {["Low", "Medium", "High"].map((u) => (
+                    {["Low", "Medium", "High", "Urgent"].map((u) => (
                       <SelectItem key={u} value={u}>
                         {u}
                       </SelectItem>
@@ -88,8 +69,8 @@ function NewRequestPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="amount">Requested amount (optional)</Label>
-                <Input id="amount" type="number" min={0} placeholder="0" />
+                {/* <Label htmlFor="amount">Requested amount (optional)</Label>
+                <Input id="amount" type="number" min={0} placeholder="0" /> */}
               </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="description">Description</Label>
@@ -97,7 +78,7 @@ function NewRequestPage() {
                   id="description"
                   required
                   rows={6}
-                  placeholder="Describe the client's situation and what assistance is needed."
+                  placeholder="Describe the situation and what assistance is needed."
                 />
               </div>
             </div>

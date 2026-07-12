@@ -13,9 +13,12 @@ import {
 } from "@/components/ui/table";
 import { mockRequests, formatDate } from "@/lib/mock-data";
 import { FilePlus2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/supabaseClient";
+import type { Database } from "../lib/supabase";
 
 const CURRENT_COUNSELOR = "Jordan Reyes";
+type Ticket = Database["public"]["Tables"]["darn_portal_tickets"]["Row"];
 
 export const Route = createFileRoute("/requests/")({
   head: () => ({ meta: [{ title: "My Requests — Counselor Portal" }] }),
@@ -27,10 +30,28 @@ function MyRequestsPage() {
   const mine = mockRequests
     .filter((r) => r.counselor === CURRENT_COUNSELOR)
     .filter((r) =>
-      q
-        ? `${r.title} ${r.client} ${r.id}`.toLowerCase().includes(q.toLowerCase())
-        : true,
+      q ? `${r.title} ${r.client} ${r.id}`.toLowerCase().includes(q.toLowerCase()) : true,
     );
+
+  const [tickets, setTickets] = useState<Ticket[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadDashboard() {
+      const { data: darn_tickets, error: ticketserror } = await supabase
+        .from("darn_portal_tickets")
+        .select("*")
+        .order("updated_at", { ascending: false });
+      setTickets(darn_tickets);
+      setLoading(false);
+    }
+
+    void loadDashboard();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <PortalShell
@@ -59,7 +80,7 @@ function MyRequestsPage() {
             <TableRow>
               <TableHead>ID</TableHead>
               <TableHead>Title</TableHead>
-              <TableHead>Client</TableHead>
+              <TableHead>Family Code</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Urgency</TableHead>
               <TableHead>Status</TableHead>
@@ -67,11 +88,11 @@ function MyRequestsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mine.map((r) => (
+            {tickets?.map((r) => (
               <TableRow key={r.id} className="cursor-pointer">
                 <TableCell className="font-mono text-xs">
                   <Link to="/requests/$id" params={{ id: r.id }}>
-                    {r.id}
+                    {"REQ-" + r.id.slice(0, 8)}
                   </Link>
                 </TableCell>
                 <TableCell className="font-medium">
@@ -79,15 +100,13 @@ function MyRequestsPage() {
                     {r.title}
                   </Link>
                 </TableCell>
-                <TableCell>{r.client}</TableCell>
-                <TableCell>{r.category}</TableCell>
-                <TableCell>{r.urgency}</TableCell>
+                <TableCell>{r.family_reference_code}</TableCell>
+                {/* <TableCell>{r.category}</TableCell> */}
+                <TableCell>{r.priority}</TableCell>
                 <TableCell>
                   <StatusBadge status={r.status} />
                 </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {formatDate(r.updatedAt)}
-                </TableCell>
+                <TableCell className="text-muted-foreground">{formatDate(r.updated_at)}</TableCell>
               </TableRow>
             ))}
             {mine.length === 0 ? (

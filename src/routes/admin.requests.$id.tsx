@@ -9,16 +9,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  mockRequests,
-  STATUSES,
-  STATUS_LABELS,
-  type RequestStatus,
-} from "@/lib/mock-data";
+import { STATUSES, STATUS_LABELS, type RequestStatus } from "@/lib/mock-data";
 import { RequestDetail } from "@/components/request-detail";
 import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
+import { useState, useEffect } from "react";
+import { Ticket, getRequest } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin/requests/$id")({
   head: () => ({ meta: [{ title: "Request — Admin" }] }),
@@ -37,11 +33,27 @@ export const Route = createFileRoute("/admin/requests/$id")({
 
 function AdminRequestDetailPage() {
   const { id } = Route.useParams();
-  const found = mockRequests.find((r) => r.id === id);
-  if (!found) throw notFound();
+  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [currentStatus, setCurrentStatus] = useState<RequestStatus>(ticket?.status || "submitted");
 
-  const [status, setStatus] = useState<RequestStatus>(found.status);
-  const request = { ...found, status };
+  useEffect(() => {
+    async function getTicket() {
+      const request = await getRequest(id);
+      if (!request) {
+        toast.error("Failed to load request. Contact site administrator.");
+        return;
+      }
+      setTicket(request);
+      setLoading(false);
+    }
+
+    void getTicket();
+  }, []);
+
+  if (!ticket) return;
+  const { status, ...react } = ticket;
+  const request = { ...react, status: currentStatus };
 
   return (
     <PortalShell
@@ -67,9 +79,9 @@ function AdminRequestDetailPage() {
               Update status
             </label>
             <Select
-              value={status}
+              value={status ?? "null"}
               onValueChange={(v) => {
-                setStatus(v as RequestStatus);
+                setCurrentStatus(v as RequestStatus);
                 toast.success(`Status updated to ${STATUS_LABELS[v as RequestStatus]}`);
               }}
             >
@@ -90,7 +102,7 @@ function AdminRequestDetailPage() {
           </Button>
         </CardContent>
       </Card>
-      <RequestDetail request={request} />
+      <RequestDetail {...request} />
     </PortalShell>
   );
 }

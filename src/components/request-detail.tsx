@@ -1,20 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/portal-shell";
-import {
-  STATUSES,
-  STATUS_LABELS,
-  formatDate,
-  type AssistanceRequest,
-} from "@/lib/mock-data";
+import { STATUSES, STATUS_LABELS, formatDate, type AssistanceRequest } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
+import { supabase } from "@/supabaseClient";
+import type { Database } from "../lib/supabase";
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
 
-interface Props {
-  request: AssistanceRequest;
-}
+type Ticket = Database["public"]["Tables"]["darn_portal_tickets"]["Row"];
 
-export function RequestDetail({ request }: Props) {
-  const reachedStatuses = new Set(request.timeline.map((e) => e.status));
+export function RequestDetail(request: AssistanceRequest) {
+  // const reachedStatuses = new Set(request.timeline.map((e) => e.status));
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -23,7 +18,9 @@ export function RequestDetail({ request }: Props) {
           <CardHeader>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-xs text-muted-foreground font-mono">{request.id}</div>
+                <div className="text-xs text-muted-foreground font-mono">
+                  {"REQ-" + request.id.slice(0, 8)}
+                </div>
                 <CardTitle className="mt-1">{request.title}</CardTitle>
               </div>
               <StatusBadge status={request.status} />
@@ -32,12 +29,12 @@ export function RequestDetail({ request }: Props) {
           <CardContent className="space-y-4 text-sm">
             <p className="text-foreground/90 whitespace-pre-line">{request.description}</p>
             <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t">
-              <Field label="Category" value={request.category} />
-              <Field label="Urgency" value={request.urgency} />
-              <Field label="Client" value={request.client} />
-              <Field label="Counselor" value={request.counselor} />
-              <Field label="Created" value={formatDate(request.createdAt)} />
-              <Field label="Updated" value={formatDate(request.updatedAt)} />
+              {/* <Field label="Category" value={request.category} /> */}
+              <Field label="Urgency" value={request.priority} />
+              {/* <Field label="Client" value={request.client} /> */}
+              {/* <Field label="Counselor" value={request.counselor} /> */}
+              <Field label="Created" value={formatDate(request.created_at)} />
+              <Field label="Updated" value={formatDate(request.updated_at)} />
             </dl>
           </CardContent>
         </Card>
@@ -47,7 +44,7 @@ export function RequestDetail({ request }: Props) {
             <CardTitle className="text-base">Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <ol className="space-y-4">
+            {/* <ol className="space-y-4">
               {[...request.timeline]
                 .sort((a, b) => a.at.localeCompare(b.at))
                 .map((evt, idx) => (
@@ -71,7 +68,7 @@ export function RequestDetail({ request }: Props) {
                     </div>
                   </li>
                 ))}
-            </ol>
+            </ol> */}
           </CardContent>
         </Card>
       </div>
@@ -82,7 +79,7 @@ export function RequestDetail({ request }: Props) {
             <CardTitle className="text-base">Status timeline</CardTitle>
           </CardHeader>
           <CardContent>
-            <ol className="space-y-3">
+            {/* <ol className="space-y-3">
               {STATUSES.map((s) => {
                 const reached = reachedStatuses.has(s);
                 const current = request.status === s;
@@ -103,7 +100,11 @@ export function RequestDetail({ request }: Props) {
                     <span
                       className={cn(
                         "text-sm",
-                        current ? "font-medium" : reached ? "text-foreground" : "text-muted-foreground",
+                        current
+                          ? "font-medium"
+                          : reached
+                            ? "text-foreground"
+                            : "text-muted-foreground",
                       )}
                     >
                       {STATUS_LABELS[s]}
@@ -111,7 +112,7 @@ export function RequestDetail({ request }: Props) {
                   </li>
                 );
               })}
-            </ol>
+            </ol> */}
           </CardContent>
         </Card>
       </div>

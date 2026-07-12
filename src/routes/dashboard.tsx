@@ -2,10 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PortalShell, StatusBadge } from "@/components/portal-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { mockRequests, STATUSES, STATUS_LABELS, formatDate } from "@/lib/mock-data";
+import { STATUSES, STATUS_LABELS, formatDate } from "@/lib/mock-data";
 import { FilePlus2, ArrowRight } from "lucide-react";
-
-const CURRENT_COUNSELOR = "Jordan Reyes";
+import { useState, useEffect } from "react";
+import type { Database } from "../lib/supabase";
+import { getAllRequests, getLoggedInUserName, Ticket } from "@/lib/auth";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Counselor Portal" }] }),
@@ -13,17 +14,42 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardPage() {
-  const mine = mockRequests.filter((r) => r.counselor === CURRENT_COUNSELOR);
-  const counts = STATUSES.reduce<Record<string, number>>((acc, s) => {
-    acc[s] = mine.filter((r) => r.status === s).length;
-    return acc;
-  }, {});
-  const recent = [...mine].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 5);
+  const [name, setName] = useState<string | null>(null);
+  const [tickets, setTickets] = useState<Ticket[] | null>(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    async function loadUser() {
+      const full_name = await getLoggedInUserName();
+      if (full_name) setName(full_name);
+    }
+
+    async function loadDashboard() {
+      const requests = await getAllRequests();
+      setTickets(requests);
+      setLoading(false);
+    }
+
+    void loadUser();
+    void loadDashboard();
+  }, []);
+
+  let counts: Record<string, number>;
+
+  if (tickets) {
+    counts = STATUSES.reduce<Record<string, number>>((acc, s) => {
+      console.log(s);
+      acc[s] = tickets.filter((r) => r.status === s).length;
+      return acc;
+    }, {});
+  }
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   return (
     <PortalShell
       role="counselor"
-      title={`Welcome back, ${CURRENT_COUNSELOR.split(" ")[0]}`}
+      title={`Welcome back, ${name?.split(" ")[0]}`}
       subtitle="Here's an overview of your active assistance requests."
       actions={
         <Button asChild>
@@ -43,7 +69,7 @@ function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-semibold">{counts[s]}</div>
+              {counts ? <div className="text-3xl font-semibold">{counts[s]}</div> : null}
             </CardContent>
           </Card>
         ))}
@@ -60,7 +86,7 @@ function DashboardPage() {
           </Button>
         </CardHeader>
         <CardContent className="divide-y">
-          {recent.map((r) => (
+          {tickets?.map((r) => (
             <Link
               key={r.id}
               to="/requests/$id"
@@ -70,7 +96,7 @@ function DashboardPage() {
               <div className="min-w-0">
                 <div className="font-medium truncate">{r.title}</div>
                 <div className="text-xs text-muted-foreground">
-                  {r.id} · {r.client} · Updated {formatDate(r.updatedAt)}
+                  {"REQ-" + r.id.slice(0, 8)} · {r.title} · Updated {formatDate(r.updated_at)}
                 </div>
               </div>
               <StatusBadge status={r.status} />

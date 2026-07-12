@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { STATUS_LABELS, STATUS_STYLES, type RequestStatus } from "@/lib/mock-data";
@@ -11,6 +11,7 @@ import {
   LogOut,
   LifeBuoy,
 } from "lucide-react";
+import { supabase } from "@/supabaseClient";
 
 interface NavItem {
   to: string;
@@ -38,8 +39,13 @@ interface PortalShellProps {
 }
 
 export function PortalShell({ children, role, title, subtitle, actions }: PortalShellProps) {
+  const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const nav = role === "admin" ? adminNav : counselorNav;
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+  };
 
   return (
     <div className="flex min-h-screen w-full bg-muted/30">
@@ -49,7 +55,7 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
             <LifeBuoy className="h-4 w-4" />
           </div>
           <div>
-            <div className="text-sm font-semibold">Counselor Portal</div>
+            <div className="text-sm font-semibold">DARN Portal</div>
             <div className="text-xs text-muted-foreground capitalize">{role} workspace</div>
           </div>
         </div>
@@ -77,30 +83,16 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
           })}
         </nav>
         <div className="border-t p-3 space-y-1">
-          {role === "counselor" ? (
-            <Link
-              to="/admin"
-              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-            >
-              <KanbanSquare className="h-4 w-4" />
-              Switch to Admin
-            </Link>
-          ) : (
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              Switch to Counselor
-            </Link>
-          )}
-          <Link
-            to="/login"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+          <button
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground hover:cursor-pointer"
+            onClick={() => {
+              handleSignOut();
+              navigate({ to: "/login" });
+            }}
           >
             <LogOut className="h-4 w-4" />
             Sign out
-          </Link>
+          </button>
         </div>
       </aside>
       <div className="flex-1 flex flex-col min-w-0">
@@ -108,9 +100,7 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
           <div className="flex items-start justify-between gap-4 px-6 py-5">
             <div>
               <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-              {subtitle ? (
-                <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>
-              ) : null}
+              {subtitle ? <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p> : null}
             </div>
             {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
           </div>

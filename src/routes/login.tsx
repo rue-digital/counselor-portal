@@ -1,15 +1,18 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LifeBuoy } from "lucide-react";
+import { supabase } from "../supabaseClient";
+import { getLoggedInUserProfile, signIn } from "@/lib/auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign in — Counselor Portal" },
+      { title: "Sign in — DARN Counselor Portal" },
       { name: "description", content: "Sign in to the counselor portal." },
     ],
   }),
@@ -18,8 +21,31 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("jordan@portal.test");
-  const [password, setPassword] = useState("password");
+  const [email, setEmail] = useState("arunima.tripathy@developforgood.org");
+  const [password, setPassword] = useState("developforgood");
+
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const signingIn = await signIn(email, password);
+
+    if (!signingIn?.user) {
+      toast.error("Could not sign in. Please try again.");
+      return;
+    }
+
+    const profile = await getLoggedInUserProfile();
+
+    if (!profile) {
+      toast.error("Could not get user profile. Please signing in again.");
+      return;
+    }
+
+    if (profile.role === "admin") {
+      navigate({ to: "/admin" });
+    } else if (profile.role === "counselor") {
+      navigate({ to: "/dashboard" });
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4 py-12">
@@ -30,19 +56,10 @@ function LoginPage() {
           </div>
           <div>
             <CardTitle>Sign in to your account</CardTitle>
-            <CardDescription>
-              Placeholder sign-in. Authentication is not wired up in this MVP.
-            </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
-          <form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              navigate({ to: "/dashboard" });
-            }}
-          >
+          <form className="space-y-4" method="POST" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -66,14 +83,6 @@ function LoginPage() {
             <Button type="submit" className="w-full">
               Continue
             </Button>
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              <Button asChild type="button" variant="outline" size="sm">
-                <Link to="/dashboard">Enter as Counselor</Link>
-              </Button>
-              <Button asChild type="button" variant="outline" size="sm">
-                <Link to="/admin">Enter as Admin</Link>
-              </Button>
-            </div>
             <p className="text-center text-xs text-muted-foreground pt-2">
               No sign up — accounts are created by an administrator.
             </p>
