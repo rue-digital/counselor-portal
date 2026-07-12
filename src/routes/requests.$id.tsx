@@ -1,9 +1,11 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PortalShell } from "@/components/portal-shell";
 import { Button } from "@/components/ui/button";
-import { mockRequests } from "@/lib/mock-data";
 import { RequestDetail } from "@/components/request-detail";
 import { ArrowLeft } from "lucide-react";
+import { Ticket, getRequest } from "@/lib/auth";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/requests/$id")({
   head: () => ({ meta: [{ title: "Request — Counselor Portal" }] }),
@@ -22,8 +24,26 @@ export const Route = createFileRoute("/requests/$id")({
 
 function RequestDetailPage() {
   const { id } = Route.useParams();
-  const request = mockRequests.find((r) => r.id === id);
-  if (!request) throw notFound();
+  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function getTicket() {
+      const request = await getRequest(id);
+      console.log(request);
+
+      if (!request) {
+        toast.error("Failed to load request. Contact site administrator.");
+        return;
+      }
+      setTicket(request);
+      setLoading(false);
+    }
+
+    void getTicket();
+  }, []);
+
+  if (!ticket) return;
 
   return (
     <PortalShell
@@ -39,7 +59,7 @@ function RequestDetailPage() {
         </Button>
       }
     >
-      <RequestDetail request={request} />
+      <RequestDetail {...ticket} />
     </PortalShell>
   );
 }

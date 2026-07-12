@@ -11,11 +11,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { mockRequests, formatDate } from "@/lib/mock-data";
+import { formatDate } from "@/lib/mock-data";
 import { FilePlus2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/supabaseClient";
 import type { Database } from "../lib/supabase";
+import { getAllRequests } from "@/lib/auth";
 
 const CURRENT_COUNSELOR = "Jordan Reyes";
 type Ticket = Database["public"]["Tables"]["darn_portal_tickets"]["Row"];
@@ -27,22 +28,13 @@ export const Route = createFileRoute("/requests/")({
 
 function MyRequestsPage() {
   const [q, setQ] = useState("");
-  const mine = mockRequests
-    .filter((r) => r.counselor === CURRENT_COUNSELOR)
-    .filter((r) =>
-      q ? `${r.title} ${r.client} ${r.id}`.toLowerCase().includes(q.toLowerCase()) : true,
-    );
-
   const [tickets, setTickets] = useState<Ticket[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadDashboard() {
-      const { data: darn_tickets, error: ticketserror } = await supabase
-        .from("darn_portal_tickets")
-        .select("*")
-        .order("updated_at", { ascending: false });
-      setTickets(darn_tickets);
+      const requests = await getAllRequests();
+      setTickets(requests);
       setLoading(false);
     }
 
@@ -109,7 +101,7 @@ function MyRequestsPage() {
                 <TableCell className="text-muted-foreground">{formatDate(r.updated_at)}</TableCell>
               </TableRow>
             ))}
-            {mine.length === 0 ? (
+            {tickets?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center text-muted-foreground py-10">
                   No requests found.
