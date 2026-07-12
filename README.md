@@ -22,13 +22,17 @@ This is the source code for the DARN counselor portal.
    bun install
    ```
 
-3. Start the development server:
+3. Connect to supabase:
+
+   Use `.env.example` to setup `.env` file locally. Look under settings/environments/dev in the Github browser for the environment variables and add to your `.env` file.
+
+4. Start the development server:
 
    ```bash
    bun dev
    ```
 
-4. Open localhost with your browser to see the result.
+5. Open localhost with your browser to see the result.
 
 # Routes
 
