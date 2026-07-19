@@ -14,19 +14,23 @@ import {
 import { formatDate } from "@/lib/mock-data";
 import { FilePlus2 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { supabase } from "@/supabaseClient";
 import type { Database } from "../lib/supabase";
 import { getAllRequests } from "@/lib/auth";
+import { requireRole } from "@/lib/route-auth";
 
-const CURRENT_COUNSELOR = "Jordan Reyes";
 type Ticket = Database["public"]["Tables"]["darn_portal_tickets"]["Row"];
 
 export const Route = createFileRoute("/requests/")({
+  beforeLoad: async () => {
+    const profile = await requireRole("counselor");
+    return { profile };
+  },
   head: () => ({ meta: [{ title: "My Requests — Counselor Portal" }] }),
   component: MyRequestsPage,
 });
 
 function MyRequestsPage() {
+  const { profile } = Route.useRouteContext();
   const [q, setQ] = useState("");
   const [tickets, setTickets] = useState<Ticket[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,12 +46,16 @@ function MyRequestsPage() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <PortalShell role={profile.role} title="My Requests">
+        <div className="text-sm text-muted-foreground">Loading requests...</div>
+      </PortalShell>
+    );
   }
 
   return (
     <PortalShell
-      role="counselor"
+      role={profile.role}
       title="My Requests"
       subtitle="All assistance requests you've submitted."
       actions={
@@ -93,7 +101,6 @@ function MyRequestsPage() {
                   </Link>
                 </TableCell>
                 <TableCell>{r.family_reference_code}</TableCell>
-                {/* <TableCell>{r.category}</TableCell> */}
                 <TableCell>{r.priority}</TableCell>
                 <TableCell>
                   <StatusBadge status={r.status} />

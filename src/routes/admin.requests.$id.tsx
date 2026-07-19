@@ -15,8 +15,13 @@ import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { Ticket, getRequest } from "@/lib/auth";
+import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/admin/requests/$id")({
+  beforeLoad: async () => {
+    const profile = await requireRole("admin");
+    return { profile };
+  },
   head: () => ({ meta: [{ title: "Request — Admin" }] }),
   component: AdminRequestDetailPage,
   notFoundComponent: () => (
@@ -32,6 +37,7 @@ export const Route = createFileRoute("/admin/requests/$id")({
 });
 
 function AdminRequestDetailPage() {
+  const { profile } = Route.useRouteContext();
   const { id } = Route.useParams();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,22 +48,31 @@ function AdminRequestDetailPage() {
       const request = await getRequest(id);
       if (!request) {
         toast.error("Failed to load request. Contact site administrator.");
+        setLoading(false);
         return;
       }
       setTicket(request);
+      setCurrentStatus(request.status);
       setLoading(false);
     }
 
     void getTicket();
-  }, []);
+  }, [id]);
 
-  if (!ticket) return;
+  if (loading || !ticket) {
+    return (
+      <PortalShell role={profile.role} title="Request detail">
+        <div className="text-sm text-muted-foreground">Loading request...</div>
+      </PortalShell>
+    );
+  }
+
   const { status, ...react } = ticket;
   const request = { ...react, status: currentStatus };
 
   return (
     <PortalShell
-      role="admin"
+      role={profile.role}
       title="Request detail"
       subtitle="Review and update the status of this request."
       actions={

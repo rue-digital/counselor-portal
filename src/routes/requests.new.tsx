@@ -14,18 +14,24 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { toast } from "sonner";
+import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/requests/new")({
+  beforeLoad: async () => {
+    const profile = await requireRole("counselor");
+    return { profile };
+  },
   head: () => ({ meta: [{ title: "New Request — Counselor Portal" }] }),
   component: NewRequestPage,
 });
 
 function NewRequestPage() {
+  const { profile } = Route.useRouteContext();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
 
   return (
-    <PortalShell role="counselor" title="Submit Assistance Request">
+    <PortalShell role={profile.role} title="Submit Assistance Request">
       <Card className="max-w-3xl">
         <CardHeader>
           <CardTitle className="text-base">Request details</CardTitle>

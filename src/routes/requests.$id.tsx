@@ -6,8 +6,13 @@ import { ArrowLeft } from "lucide-react";
 import { Ticket, getRequest } from "@/lib/auth";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/requests/$id")({
+  beforeLoad: async () => {
+    const profile = await requireRole("counselor");
+    return { profile };
+  },
   head: () => ({ meta: [{ title: "Request — Counselor Portal" }] }),
   component: RequestDetailPage,
   notFoundComponent: () => (
@@ -23,6 +28,7 @@ export const Route = createFileRoute("/requests/$id")({
 });
 
 function RequestDetailPage() {
+  const { profile } = Route.useRouteContext();
   const { id } = Route.useParams();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,11 +49,17 @@ function RequestDetailPage() {
     void getTicket();
   }, []);
 
-  if (!ticket) return;
+  if (loading || !ticket) {
+    return (
+      <PortalShell role={profile.role} title="Request detail">
+        <div className="text-sm text-muted-foreground">Loading request...</div>
+      </PortalShell>
+    );
+  }
 
   return (
     <PortalShell
-      role="counselor"
+      role={profile.role}
       title="Request detail"
       subtitle="View the full request and its status history."
       actions={

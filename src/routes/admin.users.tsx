@@ -40,13 +40,19 @@ import {
   CreatedUser,
   createUser,
 } from "@/lib/auth";
+import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/admin/users")({
+  beforeLoad: async () => {
+    const profile = await requireRole("admin");
+    return { profile };
+  },
   head: () => ({ meta: [{ title: "Users — Admin" }] }),
   component: UsersPage,
 });
 
 function UsersPage() {
+  const { profile } = Route.useRouteContext();
   const [open, setOpen] = useState(false);
   const [showCreateInfo, setShowCreateInfo] = useState(false);
 
@@ -72,7 +78,11 @@ function UsersPage() {
   }, []);
 
   if (users === null) {
-    return <div>Loading...</div>;
+    return (
+      <PortalShell role={profile.role} title="Users">
+        <div className="text-sm text-muted-foreground">Loading users...</div>
+      </PortalShell>
+    );
   }
 
   const handleDeleteUser = async (id: string) => {
@@ -105,8 +115,8 @@ function UsersPage() {
 
   return (
     <PortalShell
-      role="admin"
-      title="User Management"
+      role={profile.role}
+      title={`Welcome back, ${profile.full_name.split(" ")[0]}`}
       subtitle="Create login credentials for counselors and administrators."
       actions={
         <Dialog
