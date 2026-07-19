@@ -3,32 +3,30 @@ import { PortalShell, StatusBadge } from "@/components/portal-shell";
 import { Card } from "@/components/ui/card";
 import { STATUSES, STATUS_LABELS, formatDate, type RequestStatus } from "@/lib/mock-data";
 import { useState, useEffect } from "react";
-import { getAllRequests, getLoggedInUserName } from "@/lib/auth";
-import type { Ticket } from "@/lib/auth";
+import { getAllRequests, type Ticket } from "@/lib/auth";
+import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/admin/")({
+  beforeLoad: async () => {
+    const profile = await requireRole("admin");
+    return { profile };
+  },
   head: () => ({ meta: [{ title: "Request Board — Admin" }] }),
   component: AdminBoardPage,
 });
 
 function AdminBoardPage() {
-  const [name, setName] = useState<string | null>(null);
+  const { profile } = Route.useRouteContext();
   const [tickets, setTickets] = useState<Ticket[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadUser() {
-      const name = await getLoggedInUserName();
-      if (name) setName(name);
-    }
-
     async function loadDashboard() {
       const requests = await getAllRequests();
       setTickets(requests);
       setLoading(false);
     }
 
-    void loadUser();
     void loadDashboard();
   }, []);
 
@@ -36,7 +34,15 @@ function AdminBoardPage() {
   if (tickets) {
     byStatus = STATUSES.reduce<Record<RequestStatus, Ticket[]>>(
       (acc, s) => {
-        acc[s] = tickets?.filter((r) => r.status === s);
+        acc[s] = tickets.filter((r) => r.status === s);
+        return acc;
+      },
+      {} as Record<RequestStatus, Ticket[]>,
+    );
+  } else {
+    byStatus = STATUSES.reduce<Record<RequestStatus, Ticket[]>>(
+      (acc, s) => {
+        acc[s] = [];
         return acc;
       },
       {} as Record<RequestStatus, Ticket[]>,
@@ -44,13 +50,17 @@ function AdminBoardPage() {
   }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <PortalShell role={profile.role} title="Loading...">
+        <div className="text-sm text-muted-foreground">Loading requests...</div>
+      </PortalShell>
+    );
   }
 
   return (
     <PortalShell
-      role="admin"
-      title={`Welcome back, ${name?.split(" ")[0]}`}
+      role={profile.role}
+      title={`Welcome back, ${profile.full_name.split(" ")[0]}`}
       subtitle="All counselor requests, organized by status."
     >
       <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(260px,1fr))]">
@@ -73,7 +83,6 @@ function AdminBoardPage() {
                     </div>
                     <div className="font-medium text-sm mt-0.5 line-clamp-2">{r.title}</div>
                     <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                      {/* <span>{r.counselor}</span> */}
                       <span
                         className={
                           r.priority === "high"
