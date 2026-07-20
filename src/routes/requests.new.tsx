@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from '@/supabaseClient.ts';
 import {
   Select,
   SelectContent,
@@ -21,6 +22,12 @@ export const Route = createFileRoute("/requests/new")({
 });
 
 function NewRequestPage() {
+  // Form input states
+  const [title, setTitle] = useState("");
+  const [familyCode, setFamilyCode] = useState("");
+  const [urgency, setUrgency] = useState("Medium");
+  const [description, setDescription] = useState("");
+  
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
 
@@ -33,25 +40,68 @@ function NewRequestPage() {
         <CardContent>
           <form
             className="space-y-5"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
               setSubmitting(true);
-              setTimeout(() => {
-                toast.success("Request submitted", {
-                  description: "Your request has been queued for review.",
-                });
-                navigate({ to: "/requests" });
-              }, 400);
+
+              try {
+                // 1. Get the current logged-in user
+                const { data: { user } } = await supabase.auth.getUser();
+
+                if (!user) {
+                  toast.error("You must be logged in to submit a request.");
+                  setSubmitting(false);
+                  return;
+                }
+
+                // 2. Insert into Supabase
+                const { error } = await supabase.from("darn_portal_tickets").insert([
+                  {
+                    title,
+                    description,
+                    family_reference_code: familyCode,
+                    priority: urgency.toLowerCase(),
+                    status: "submitted",
+                    created_by_profile_id: user.id,
+                  },
+                ]);
+
+                if (error) {
+                  toast.error("Failed to submit request: " + error.message);
+                } else {
+                  toast.success("Request submitted", {
+                    description: "Your request has been queued for review.",
+                  });
+                  // 3. Redirect back to the admin board
+                  navigate({ to: "/admin" });
+                }
+              } catch (err) {
+                toast.error("An unexpected error occurred.");
+              } finally {
+                setSubmitting(false);
+              }
             }}
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="title">Title</Label>
-                <Input id="title" required placeholder="Brief summary of the request" />
+                <Input
+                  id="title"
+                  required
+                  placeholder="Brief summary of the request"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="identifier">Family reference code</Label>
-                <Input id="identifier" required placeholder="e.g. A. Nguyen" />
+                <Input
+                  id="identifier"
+                  required
+                  placeholder="e.g. A. Nguyen"
+                  value={familyCode}
+                  onChange={(e) => setFamilyCode(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="urgency">Urgency</Label>
@@ -79,6 +129,8 @@ function NewRequestPage() {
                   required
                   rows={6}
                   placeholder="Describe the situation and what assistance is needed."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
             </div>
