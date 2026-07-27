@@ -5,51 +5,54 @@ import { Button } from "@/components/ui/button";
 import { STATUSES, STATUS_LABELS, formatDate } from "@/lib/mock-data";
 import { FilePlus2, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
-import type { Database } from "../lib/supabase";
-import { getAllRequests, getLoggedInUserName, Ticket } from "@/lib/auth";
+import { getAllRequests, Ticket } from "@/lib/auth";
+import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/dashboard")({
+  beforeLoad: async () => {
+    const profile = await requireRole("counselor");
+    return { profile };
+  },
   head: () => ({ meta: [{ title: "Dashboard — Counselor Portal" }] }),
   component: DashboardPage,
 });
 
 function DashboardPage() {
-  const [name, setName] = useState<string | null>(null);
+  const { profile } = Route.useRouteContext();
   const [tickets, setTickets] = useState<Ticket[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadUser() {
-      const full_name = await getLoggedInUserName();
-      if (full_name) setName(full_name);
-    }
-
     async function loadDashboard() {
       const requests = await getAllRequests();
       setTickets(requests);
       setLoading(false);
     }
 
-    void loadUser();
     void loadDashboard();
   }, []);
 
-  let counts: Record<string, number>;
+  let counts: Record<string, number> = {};
 
   if (tickets) {
     counts = STATUSES.reduce<Record<string, number>>((acc, s) => {
-      console.log(s);
       acc[s] = tickets.filter((r) => r.status === s).length;
       return acc;
     }, {});
   }
+
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <PortalShell role={profile.role} title="Dashboard">
+        <div className="text-sm text-muted-foreground">Loading dashboard...</div>
+      </PortalShell>
+    );
   }
+
   return (
     <PortalShell
-      role="counselor"
-      title={`Welcome back, ${name?.split(" ")[0]}`}
+      role={profile.role}
+      title={`Welcome back, ${profile.full_name.split(" ")[0]}`}
       subtitle="Here's an overview of your active assistance requests."
       actions={
         <Button asChild>
@@ -69,7 +72,7 @@ function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {counts ? <div className="text-3xl font-semibold">{counts[s]}</div> : null}
+              <div className="text-3xl font-semibold">{counts[s]}</div>
             </CardContent>
           </Card>
         ))}
@@ -78,6 +81,12 @@ function DashboardPage() {
       <Card className="mt-6">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">Recent activity</CardTitle>
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/requests">
+              View all
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
           <Button asChild variant="ghost" size="sm">
             <Link to="/requests">
               View all
