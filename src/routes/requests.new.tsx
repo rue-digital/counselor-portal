@@ -15,6 +15,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { requireRole } from "@/lib/route-auth";
+import { SCHOOL_VALUES, ASSISTANCE_TYPE_VALUES, ASSISTANCE_REASON_VALUES } from "@/lib/auth";
 
 export const Route = createFileRoute("/requests/new")({
   beforeLoad: async () => {
@@ -52,12 +53,89 @@ function NewRequestPage() {
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="title">Title</Label>
-                <Input id="title" required placeholder="Brief summary of the request" />
+                <Label htmlFor="title">What does the family need?</Label>
+                <Input
+                  id="title"
+                  required
+                  placeholder="Example: Kroger gift card, electric bill payment, twin mattress, bicycle"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="identifier">Family reference code</Label>
                 <Input id="identifier" required placeholder="e.g. A. Nguyen" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="school">School</Label>
+                <Select defaultValue="Bexley High School">
+                  <SelectTrigger id="school">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SCHOOL_VALUES.map((u) => (
+                      <SelectItem key={u} value={u}>
+                        {u}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="type">Type of Assistance Requested</Label>
+                <Select defaultValue="Other">
+                  <SelectTrigger id="type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ASSISTANCE_TYPE_VALUES.map((u) => (
+                      <SelectItem key={u} value={u}>
+                        {u}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="reason">Primary Reason for Request</Label>
+                <Select defaultValue="Other">
+                  <SelectTrigger id="reason">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ASSISTANCE_REASON_VALUES.map((u) => (
+                      <SelectItem key={u} value={u}>
+                        {u}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2 sm:col-span-2 mt-4">
+                <Label htmlFor="assistance_reason_text">Reason for Assistance</Label>
+                <Textarea
+                  id="assistance_reason_text"
+                  rows={2}
+                  placeholder="Describe the family's situation and explain why this assistance is needed. Include any circumstances that will help reviewers understand the request."
+                />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="past_support_text">
+                  What support has this family received from DARN in the past 12 months?
+                </Label>
+                <Textarea
+                  id="past_support_text"
+                  rows={2}
+                  required
+                  placeholder="If known, describe any assistance the family has received."
+                />
+              </div>
+              <div className="space-y-2 sm:col-span-2 mt-4">
+                <Label htmlFor="description">Describe what is needed</Label>
+                <Textarea
+                  id="description"
+                  required
+                  rows={6}
+                  placeholder="Include specifics such as amounts, sizes, gender identity, or any other details needed to fulfill this request."
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="urgency">Urgency</Label>
@@ -73,19 +151,6 @@ function NewRequestPage() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="space-y-2">
-                {/* <Label htmlFor="amount">Requested amount (optional)</Label>
-                <Input id="amount" type="number" min={0} placeholder="0" /> */}
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  required
-                  rows={6}
-                  placeholder="Describe the situation and what assistance is needed."
-                />
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-2">

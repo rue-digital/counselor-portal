@@ -169,6 +169,8 @@ export type Database = {
       };
       darn_portal_tickets: {
         Row: {
+          assistance_reason: Database["public"]["Enums"]["darn_ticket_assistance_reason"];
+          assistance_type: Database["public"]["Enums"]["darn_ticket_assistance_type"];
           created_at: string;
           created_by_profile_id: string;
           description: string;
@@ -177,11 +179,14 @@ export type Database = {
           needed_by: string | null;
           priority: Database["public"]["Enums"]["darn_ticket_priority"];
           request_type: string;
+          school: Database["public"]["Enums"]["school"];
           status: Database["public"]["Enums"]["darn_ticket_status"];
           title: string;
           updated_at: string;
         };
         Insert: {
+          assistance_reason?: Database["public"]["Enums"]["darn_ticket_assistance_reason"];
+          assistance_type?: Database["public"]["Enums"]["darn_ticket_assistance_type"];
           created_at?: string;
           created_by_profile_id: string;
           description: string;
@@ -190,11 +195,14 @@ export type Database = {
           needed_by?: string | null;
           priority?: Database["public"]["Enums"]["darn_ticket_priority"];
           request_type: string;
+          school?: Database["public"]["Enums"]["school"];
           status?: Database["public"]["Enums"]["darn_ticket_status"];
           title: string;
           updated_at?: string;
         };
         Update: {
+          assistance_reason?: Database["public"]["Enums"]["darn_ticket_assistance_reason"];
+          assistance_type?: Database["public"]["Enums"]["darn_ticket_assistance_type"];
           created_at?: string;
           created_by_profile_id?: string;
           description?: string;
@@ -203,6 +211,7 @@ export type Database = {
           needed_by?: string | null;
           priority?: Database["public"]["Enums"]["darn_ticket_priority"];
           request_type?: string;
+          school?: Database["public"]["Enums"]["school"];
           status?: Database["public"]["Enums"]["darn_ticket_status"];
           title?: string;
           updated_at?: string;
@@ -282,6 +291,24 @@ export type Database = {
     };
     Enums: {
       darn_app_role: "admin" | "counselor";
+      darn_ticket_assistance_reason:
+        | "Financial Hardship"
+        | "Employment Change"
+        | "Medical or Health Issue"
+        | "Housing or Relocation"
+        | "Family Change"
+        | "Unexpected Expense"
+        | "Other";
+      darn_ticket_assistance_type:
+        | "Utility Bill"
+        | "Gift Card"
+        | "Bicycle"
+        | "Glasses"
+        | "Clothing"
+        | "Furniture"
+        | "Bus Pass"
+        | "Household Items"
+        | "Other";
       darn_ticket_priority: "low" | "medium" | "high" | "urgent";
       darn_ticket_status:
         | "submitted"
@@ -429,6 +456,26 @@ export const Constants = {
   public: {
     Enums: {
       darn_app_role: ["admin", "counselor"],
+      darn_ticket_assistance_reason: [
+        "Financial Hardship",
+        "Employment Change",
+        "Medical or Health Issue",
+        "Housing or Relocation",
+        "Family Change",
+        "Unexpected Expense",
+        "Other",
+      ],
+      darn_ticket_assistance_type: [
+        "Utility Bill",
+        "Gift Card",
+        "Bicycle",
+        "Glasses",
+        "Clothing",
+        "Furniture",
+        "Bus Pass",
+        "Household Items",
+        "Other",
+      ],
       darn_ticket_priority: ["low", "medium", "high", "urgent"],
       darn_ticket_status: ["submitted", "in_review", "approved", "fulfilled", "closed", "rejected"],
       roles: ["admin", "counselor"],
