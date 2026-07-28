@@ -163,7 +163,7 @@ function NewRequestPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="priority">Urgency</Label>
-                <Select defaultValue="Medium" name="priority">
+                <Select defaultValue="Low" name="priority">
                   <SelectTrigger id="priority">
                     <SelectValue />
                   </SelectTrigger>

@@ -312,7 +312,7 @@ export type Database = {
         | "Bus Pass"
         | "Household Items"
         | "Other";
-      darn_ticket_priority: "low" | "medium" | "high" | "urgent";
+      darn_ticket_priority: "Low" | "Medium" | "High" | "Urgent";
       darn_ticket_status:
         | "submitted"
         | "in_review"
@@ -479,7 +479,7 @@ export const Constants = {
         "Household Items",
         "Other",
       ],
-      darn_ticket_priority: ["low", "medium", "high", "urgent"],
+      darn_ticket_priority: ["Low", "Medium", "High", "Urgent"],
       darn_ticket_status: ["submitted", "in_review", "approved", "fulfilled", "closed", "rejected"],
       roles: ["admin", "counselor"],
       school: [
