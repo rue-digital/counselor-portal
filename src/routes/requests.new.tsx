@@ -42,11 +42,7 @@ function NewRequestPage() {
     try {
       const formData = new FormData(e.currentTarget);
       const ticketData = Object.fromEntries(formData.entries());
-      const result = await createRequest(ticketData);
-
-      if (!result) {
-        toast.error("Error creating ticket.");
-      }
+      await createRequest(ticketData);
 
       setTimeout(() => {
         toast.success("Request submitted", {
@@ -54,6 +50,8 @@ function NewRequestPage() {
         });
         navigate({ to: "/requests" });
       }, 400);
+    } catch (error) {
+      toast.error("Error creating ticket.");
     } finally {
       setSubmitting(false);
     }
@@ -164,9 +162,9 @@ function NewRequestPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="urgency">Urgency</Label>
-                <Select defaultValue="Medium">
-                  <SelectTrigger id="urgency">
+                <Label htmlFor="priority">Urgency</Label>
+                <Select defaultValue="Medium" name="priority">
+                  <SelectTrigger id="priority">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
