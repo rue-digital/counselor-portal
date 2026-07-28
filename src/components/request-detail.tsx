@@ -26,7 +26,7 @@ export function RequestDetail(request: Ticket) {
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <p className="text-foreground/90 whitespace-pre-line">{request.assistance_details}</p>
-            <p className="text-foreground/90 whitespace-pre-line">{request.description}</p>
+            <p className="text-foreground/90 whitespace-pre-line">{request.request_details}</p>
             <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t">
               <Field label="Category" value={request.assistance_type} />
               <Field label="Urgency" value={request.priority} />
