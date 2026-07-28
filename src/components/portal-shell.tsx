@@ -41,7 +41,6 @@ interface PortalShellProps {
 export function PortalShell({ children, role, title, subtitle, actions }: PortalShellProps) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  console.log(pathname);
   const nav = role === "admin" ? adminNav : counselorNav;
 
   const handleSignOut = async () => {
