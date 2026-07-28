@@ -105,7 +105,7 @@ function DashboardPage() {
               <div className="min-w-0">
                 <div className="font-medium truncate">{r.title}</div>
                 <div className="text-xs text-muted-foreground">
-                  {"REQ-" + r.id.slice(0, 8)} · {r.request_summary} · Updated{" "}
+                  {"REQ-" + r.id.slice(0, 8)} · {r.requested_item} · Updated{" "}
                   {formatDate(r.updated_at)}
                 </div>
               </div>

@@ -75,7 +75,7 @@ function NewRequestPage() {
                   type="text"
                   required
                   placeholder="Example: Kroger gift card, electric bill payment, twin mattress, bicycle"
-                  name="request_summary"
+                  name="requested_item"
                 />
               </div>
               <div className="space-y-2">
@@ -89,9 +89,9 @@ function NewRequestPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="school">School</Label>
-                <Select defaultValue="Bexley High School" name="school">
-                  <SelectTrigger id="school">
+                <Label htmlFor="school_name">School</Label>
+                <Select defaultValue="Bexley High School" name="school_name">
+                  <SelectTrigger id="school_name">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -105,7 +105,7 @@ function NewRequestPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="type">Type of Assistance Requested</Label>
-                <Select defaultValue="Other" name="request_category">
+                <Select defaultValue="Other" name="assistance_type">
                   <SelectTrigger id="type">
                     <SelectValue />
                   </SelectTrigger>
@@ -120,7 +120,7 @@ function NewRequestPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="reason">Primary Reason for Request</Label>
-                <Select defaultValue="Other" name="request_reason">
+                <Select defaultValue="Other" name="assistance_reason">
                   <SelectTrigger id="reason">
                     <SelectValue />
                   </SelectTrigger>
@@ -134,30 +134,30 @@ function NewRequestPage() {
                 </Select>
               </div>
               <div className="space-y-2 sm:col-span-2 mt-4">
-                <Label htmlFor="assistance_reason_text">Reason for Assistance</Label>
+                <Label htmlFor="assistance_details">Reason for Assistance</Label>
                 <Textarea
-                  id="assistance_reason_text"
+                  id="assistance_details"
                   rows={2}
-                  name="assistance_explanation"
+                  name="assistance_details"
                   placeholder="Describe the family's situation and explain why this assistance is needed. Include any circumstances that will help reviewers understand the request."
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="past_support_text">
+                <Label htmlFor="past_assistance">
                   What support has this family received from DARN in the past 12 months?
                 </Label>
                 <Textarea
-                  id="past_support_text"
+                  id="past_assistance"
                   rows={2}
-                  name="past_support"
+                  name="past_assistance"
                   placeholder="If known, describe any assistance the family has received."
                 />
               </div>
               <div className="space-y-2 sm:col-span-2 mt-4">
-                <Label htmlFor="description">Describe what is needed</Label>
+                <Label htmlFor="request_details">Describe what is needed</Label>
                 <Textarea
-                  id="description"
-                  name="description"
+                  id="request_details"
+                  name="request_details"
                   required
                   rows={6}
                   placeholder="Include specifics such as amounts, sizes, gender identity, or any other details needed to fulfill this request."

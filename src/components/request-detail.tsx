@@ -19,18 +19,16 @@ export function RequestDetail(request: Ticket) {
                 <div className="text-xs text-muted-foreground font-mono">
                   {"REQ-" + request.id.slice(0, 8)}
                 </div>
-                <CardTitle className="mt-1">{request.request_summary}</CardTitle>
+                <CardTitle className="mt-1">{request.requested_item}</CardTitle>
               </div>
               <StatusBadge status={request.status} />
             </div>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
-            <p className="text-foreground/90 whitespace-pre-line">
-              {request.assistance_explanation}
-            </p>
+            <p className="text-foreground/90 whitespace-pre-line">{request.assistance_details}</p>
             <p className="text-foreground/90 whitespace-pre-line">{request.description}</p>
             <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t">
-              <Field label="Category" value={request.request_category} />
+              <Field label="Category" value={request.assistance_type} />
               <Field label="Urgency" value={request.priority} />
               {/* <Field label="Client" value={request.client} /> */}
               {/* <Field label="Counselor" value={request.counselor} /> */}
