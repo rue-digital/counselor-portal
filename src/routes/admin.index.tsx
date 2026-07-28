@@ -81,7 +81,9 @@ function AdminBoardPage() {
                     <div className="text-xs font-mono text-muted-foreground">
                       {"REQ-" + r.id.slice(0, 8)}
                     </div>
-                    <div className="font-medium text-sm mt-0.5 line-clamp-2">{r.title}</div>
+                    <div className="font-medium text-sm mt-0.5 line-clamp-2">
+                      {r.request_summary}
+                    </div>
                     <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
                       <span
                         className={

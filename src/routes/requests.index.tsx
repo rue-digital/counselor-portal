@@ -97,10 +97,11 @@ function MyRequestsPage() {
                 </TableCell>
                 <TableCell className="font-medium">
                   <Link to="/requests/$id" params={{ id: r.id }}>
-                    {r.title}
+                    {r.request_summary}
                   </Link>
                 </TableCell>
                 <TableCell>{r.family_reference_code}</TableCell>
+                <TableCell>{r.request_category}</TableCell>
                 <TableCell>{r.priority}</TableCell>
                 <TableCell>
                   <StatusBadge status={r.status} />

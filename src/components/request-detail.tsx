@@ -3,12 +3,10 @@ import { StatusBadge } from "@/components/portal-shell";
 import { STATUSES, STATUS_LABELS, formatDate, type AssistanceRequest } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/supabaseClient";
-import type { Database } from "../lib/supabase";
 import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
+import { Ticket } from "@/lib/auth";
 
-type Ticket = Database["public"]["Tables"]["darn_portal_tickets"]["Row"];
-
-export function RequestDetail(request: AssistanceRequest) {
+export function RequestDetail(request: Ticket) {
   // const reachedStatuses = new Set(request.timeline.map((e) => e.status));
 
   return (
@@ -21,15 +19,18 @@ export function RequestDetail(request: AssistanceRequest) {
                 <div className="text-xs text-muted-foreground font-mono">
                   {"REQ-" + request.id.slice(0, 8)}
                 </div>
-                <CardTitle className="mt-1">{request.title}</CardTitle>
+                <CardTitle className="mt-1">{request.request_summary}</CardTitle>
               </div>
               <StatusBadge status={request.status} />
             </div>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
+            <p className="text-foreground/90 whitespace-pre-line">
+              {request.assistance_explanation}
+            </p>
             <p className="text-foreground/90 whitespace-pre-line">{request.description}</p>
             <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t">
-              {/* <Field label="Category" value={request.category} /> */}
+              <Field label="Category" value={request.request_category} />
               <Field label="Urgency" value={request.priority} />
               {/* <Field label="Client" value={request.client} /> */}
               {/* <Field label="Counselor" value={request.counselor} /> */}
