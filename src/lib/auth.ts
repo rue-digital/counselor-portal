@@ -138,6 +138,27 @@ export async function createUser(user: CreatedUser) {
   return data;
 }
 
+export async function createRequest(request: Omit<Ticket, "created_by_profile_id">) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  const { data, error } = await supabase
+    .from("darn_portal_tickets")
+    .insert({
+      ...request,
+      created_by_profile_id: user.id,
+    })
+    .select()
+    .single();
+
+  if (error || !data) throw error;
+
+  return data;
+}
+
 export function generatePassword(length = 16) {
   const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
   let password = "";

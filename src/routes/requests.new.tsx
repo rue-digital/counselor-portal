@@ -16,6 +16,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { requireRole } from "@/lib/route-auth";
 import { SCHOOL_VALUES, ASSISTANCE_TYPE_VALUES, ASSISTANCE_REASON_VALUES } from "@/lib/auth";
+import { createRequest } from "@/lib/auth";
 
 export const Route = createFileRoute("/requests/new")({
   beforeLoad: async () => {
@@ -31,6 +32,33 @@ function NewRequestPage() {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
 
+  const handleSubmit = async (e: {
+    preventDefault: () => void;
+    currentTarget: HTMLFormElement | undefined;
+  }) => {
+    e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const formData = new FormData(e.currentTarget);
+      const ticketData = Object.fromEntries(formData.entries());
+      const result = await createRequest(ticketData);
+
+      if (!result) {
+        toast.error("Error creating ticket.");
+      }
+
+      setTimeout(() => {
+        toast.success("Request submitted", {
+          description: "Your request has been queued for review.",
+        });
+        navigate({ to: "/requests" });
+      }, 400);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <PortalShell role={profile.role} title="Submit Assistance Request">
       <Card className="max-w-3xl">
@@ -38,35 +66,31 @@ function NewRequestPage() {
           <CardTitle className="text-base">Request details</CardTitle>
         </CardHeader>
         <CardContent>
-          <form
-            className="space-y-5"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSubmitting(true);
-              setTimeout(() => {
-                toast.success("Request submitted", {
-                  description: "Your request has been queued for review.",
-                });
-                navigate({ to: "/requests" });
-              }, 400);
-            }}
-          >
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="title">What does the family need?</Label>
                 <Input
                   id="title"
+                  type="text"
                   required
                   placeholder="Example: Kroger gift card, electric bill payment, twin mattress, bicycle"
+                  name="request_summary"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="identifier">Family reference code</Label>
-                <Input id="identifier" required placeholder="e.g. A. Nguyen" />
+                <Input
+                  id="identifier"
+                  type="text"
+                  name="family_reference_code"
+                  required
+                  placeholder="e.g. A. Nguyen"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="school">School</Label>
-                <Select defaultValue="Bexley High School">
+                <Select defaultValue="Bexley High School" name="school">
                   <SelectTrigger id="school">
                     <SelectValue />
                   </SelectTrigger>
@@ -81,7 +105,7 @@ function NewRequestPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="type">Type of Assistance Requested</Label>
-                <Select defaultValue="Other">
+                <Select defaultValue="Other" name="request_category">
                   <SelectTrigger id="type">
                     <SelectValue />
                   </SelectTrigger>
@@ -96,7 +120,7 @@ function NewRequestPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="reason">Primary Reason for Request</Label>
-                <Select defaultValue="Other">
+                <Select defaultValue="Other" name="request_reason">
                   <SelectTrigger id="reason">
                     <SelectValue />
                   </SelectTrigger>
@@ -114,6 +138,7 @@ function NewRequestPage() {
                 <Textarea
                   id="assistance_reason_text"
                   rows={2}
+                  name="assistance_explanation"
                   placeholder="Describe the family's situation and explain why this assistance is needed. Include any circumstances that will help reviewers understand the request."
                 />
               </div>
@@ -124,7 +149,7 @@ function NewRequestPage() {
                 <Textarea
                   id="past_support_text"
                   rows={2}
-                  required
+                  name="past_support"
                   placeholder="If known, describe any assistance the family has received."
                 />
               </div>
@@ -132,6 +157,7 @@ function NewRequestPage() {
                 <Label htmlFor="description">Describe what is needed</Label>
                 <Textarea
                   id="description"
+                  name="description"
                   required
                   rows={6}
                   placeholder="Include specifics such as amounts, sizes, gender identity, or any other details needed to fulfill this request."

@@ -169,51 +169,54 @@ export type Database = {
       };
       darn_portal_tickets: {
         Row: {
-          assistance_reason: Database["public"]["Enums"]["darn_ticket_assistance_reason"];
-          assistance_type: Database["public"]["Enums"]["darn_ticket_assistance_type"];
+          assistance_explanation: string | null;
           created_at: string;
           created_by_profile_id: string;
           description: string;
           family_reference_code: string | null;
           id: string;
           needed_by: string | null;
+          past_support: string | null;
           priority: Database["public"]["Enums"]["darn_ticket_priority"];
-          request_type: string;
+          request_category: Database["public"]["Enums"]["darn_ticket_assistance_type"];
+          request_reason: Database["public"]["Enums"]["darn_ticket_assistance_reason"];
+          request_summary: string;
           school: Database["public"]["Enums"]["school"];
           status: Database["public"]["Enums"]["darn_ticket_status"];
-          title: string;
           updated_at: string;
         };
         Insert: {
-          assistance_reason?: Database["public"]["Enums"]["darn_ticket_assistance_reason"];
-          assistance_type?: Database["public"]["Enums"]["darn_ticket_assistance_type"];
+          assistance_explanation?: string | null;
           created_at?: string;
           created_by_profile_id: string;
           description: string;
           family_reference_code?: string | null;
           id?: string;
           needed_by?: string | null;
+          past_support?: string | null;
           priority?: Database["public"]["Enums"]["darn_ticket_priority"];
-          request_type: string;
+          request_category?: Database["public"]["Enums"]["darn_ticket_assistance_type"];
+          request_reason?: Database["public"]["Enums"]["darn_ticket_assistance_reason"];
+          request_summary: string;
           school?: Database["public"]["Enums"]["school"];
           status?: Database["public"]["Enums"]["darn_ticket_status"];
-          title: string;
           updated_at?: string;
         };
         Update: {
-          assistance_reason?: Database["public"]["Enums"]["darn_ticket_assistance_reason"];
-          assistance_type?: Database["public"]["Enums"]["darn_ticket_assistance_type"];
+          assistance_explanation?: string | null;
           created_at?: string;
           created_by_profile_id?: string;
           description?: string;
           family_reference_code?: string | null;
           id?: string;
           needed_by?: string | null;
+          past_support?: string | null;
           priority?: Database["public"]["Enums"]["darn_ticket_priority"];
-          request_type?: string;
+          request_category?: Database["public"]["Enums"]["darn_ticket_assistance_type"];
+          request_reason?: Database["public"]["Enums"]["darn_ticket_assistance_reason"];
+          request_summary?: string;
           school?: Database["public"]["Enums"]["school"];
           status?: Database["public"]["Enums"]["darn_ticket_status"];
-          title?: string;
           updated_at?: string;
         };
         Relationships: [
