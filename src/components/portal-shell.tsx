@@ -61,9 +61,7 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">
           {nav.map((item) => {
-            const active =
-              pathname === item.to ||
-              (item.to !== "/dashboard" && item.to !== "/admin" && pathname.startsWith(item.to));
+            const active = pathname === item.to;
             const Icon = item.icon;
             return (
               <Link

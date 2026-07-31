@@ -3,6 +3,43 @@ import { supabase } from "@/supabaseClient";
 
 export type Profile = Database["public"]["Tables"]["darn_portal_profiles"]["Row"];
 export type Ticket = Database["public"]["Tables"]["darn_portal_tickets"]["Row"];
+
+type schools = Database["public"]["Enums"]["school"];
+type assistance_type = Database["public"]["Enums"]["darn_ticket_assistance_type"];
+type assistance_reason = Database["public"]["Enums"]["darn_ticket_assistance_reason"];
+
+export const SCHOOL_VALUES: schools[] = [
+  "Bexley High School",
+  "Bexley Middle School",
+  "Cassingham Elementary",
+  "Maryland Elementary",
+  "Montrose Elementary",
+  "Preschool",
+  "Other",
+] as const;
+
+export const ASSISTANCE_TYPE_VALUES: assistance_type[] = [
+  "Utility Bill",
+  "Gift Card",
+  "Bicycle",
+  "Glasses",
+  "Clothing",
+  "Furniture",
+  "Bus Pass",
+  "Household Items",
+  "Other",
+];
+
+export const ASSISTANCE_REASON_VALUES: assistance_reason[] = [
+  "Financial Hardship",
+  "Employment Change",
+  "Medical or Health Issue",
+  "Housing or Relocation",
+  "Family Change",
+  "Unexpected Expense",
+  "Other",
+];
+
 export type CreatedUser = {
   email: string;
   name: string;
@@ -98,6 +135,27 @@ export async function createUser(user: CreatedUser) {
     body: { email: user.email, password: user.password, full_name: user.name, role: user.role },
   });
   if (error || !data) return;
+  return data;
+}
+
+export async function createRequest(request: Omit<Ticket, "created_by_profile_id">) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  const { data, error } = await supabase
+    .from("darn_portal_tickets")
+    .insert({
+      ...request,
+      created_by_profile_id: user.id,
+    })
+    .select()
+    .single();
+
+  if (error || !data) throw error;
+
   return data;
 }
 
