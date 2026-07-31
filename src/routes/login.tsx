@@ -10,12 +10,12 @@ import { toast } from "sonner";
 import { redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/login")({
-  // beforeLoad: async () => {
-  //   const profile = await getLoggedInUserProfile();
-  //   if (profile) {
-  //     throw redirect({ to: profile.role == "admin" ? "/admin" : "/dashboard" });
-  //   }
-  // },
+  beforeLoad: async () => {
+    const profile = await getLoggedInUserProfile();
+    if (profile) {
+      throw redirect({ to: profile.role == "admin" ? "/admin" : "/dashboard" });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Sign in — DARN Counselor Portal" },
