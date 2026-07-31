@@ -11,7 +11,7 @@ import {
   LogOut,
   LifeBuoy,
 } from "lucide-react";
-import { supabase } from "@/supabaseClient";
+import { createClient } from "@/lib/supabase/client";
 
 interface NavItem {
   to: string;
@@ -44,6 +44,7 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
   const nav = role === "admin" ? adminNav : counselorNav;
 
   const handleSignOut = async () => {
+    const supabase = createClient();
     const { error } = await supabase.auth.signOut();
   };
 

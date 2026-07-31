@@ -1,5 +1,6 @@
 import type { Database } from "./supabase";
-import { supabase } from "@/supabaseClient";
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 
 export type Profile = Database["public"]["Tables"]["darn_portal_profiles"]["Row"];
 export type Ticket = Database["public"]["Tables"]["darn_portal_tickets"]["Row"];
@@ -46,59 +47,96 @@ export type CreatedUser = {
   role: string;
   password: string;
 };
-export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
+
+const signInSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
+export const signIn = createServerFn({ method: "POST" })
+  .validator(signInSchema)
+  .handler(async ({ data }) => {
+    const { createClient } = await import("./supabase/supabase.server");
+    const supabase = createClient();
+
+    const { data: authData, error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
+
+    if (error) throw new Error(error.message);
+    return authData;
   });
-  if (error || !data) return;
-  return data;
-}
 
-export async function signOut() {}
+export const signOut = createServerFn({ method: "POST" }).handler(async () => {
+  const { createClient } = await import("./supabase/supabase.server");
+  const supabase = createClient();
 
-export async function getAllUsers() {
+  const { error } = await supabase.auth.signOut();
+
+  if (error) throw new Error(error.message);
+  return { success: true };
+});
+
+export const getAllUsers = createServerFn({ method: "GET" }).handler(async () => {
+  const { createClient } = await import("./supabase/supabase.server");
+  const supabase = createClient();
+
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser();
 
-  if (!user) return;
+  if (userError || !user) return null;
 
   const { data, error } = await supabase.from("darn_portal_profiles").select("*");
-  if (error || !data) return;
+
+  if (error) throw new Error(error.message);
   return data;
-}
+});
 
-// works for counselors and admin. admin when calling see all, counselors only their own.
+export const getAllRequests = createServerFn({ method: "GET" }).handler(async () => {
+  const { createClient } = await import("./supabase/supabase.server");
+  const supabase = createClient();
 
-export async function getAllRequests() {
   const { data, error } = await supabase
     .from("darn_portal_tickets")
     .select("*")
     .order("updated_at", { ascending: false });
-  if (error) throw error;
-  console.log(data);
-  return data;
-}
 
-export async function getLoggedInUserProfile() {
+  if (error) throw new Error(error.message);
+  return data;
+});
+
+export const getLoggedInUserProfile = createServerFn({
+  method: "GET",
+}).handler(async () => {
+  const { createClient } = await import("./supabase/supabase.server");
+  const supabase = createClient();
+
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser();
 
-  if (!user) return;
+  if (userError || !user) return null;
 
-  const { data, error } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("darn_portal_profiles")
     .select("*")
     .eq("id", user.id)
     .single();
 
-  if (error || !data) return;
-  return data;
-}
+  if (profileError || !profile) return null;
+  return profile;
+});
 
-export async function getLoggedInUserName() {
+export const getLoggedInUserName = createServerFn({
+  method: "GET",
+}).handler(async () => {
+  const { createClient } = await import("./supabase/supabase.server");
+  const supabase = createClient();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -113,30 +151,52 @@ export async function getLoggedInUserName() {
 
   if (error) return;
   return data.full_name;
-}
+});
 
-export async function getRequest(id: string) {
-  const { data, error } = await supabase
-    .from("darn_portal_tickets")
-    .select("*")
-    .eq("id", id)
-    .single();
-  if (error || !data) return;
-  return data;
-}
+export const getRequest = createServerFn({ method: "GET" })
+  .validator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    const { createClient } = await import("./supabase/supabase.server");
+    const supabase = createClient();
 
-export async function deleteUser(id: string) {
-  const { error } = await supabase.from("darn_portal_profiles").delete().eq("id", id);
-  return error;
-}
+    const { data: requests, error } = await supabase
+      .from("darn_portal_tickets")
+      .select("*")
+      .eq("id", data.id)
+      .single();
 
-export async function createUser(user: CreatedUser) {
-  const { data, error } = await supabase.functions.invoke("admin-create-user-no-verify", {
-    body: { email: user.email, password: user.password, full_name: user.name, role: user.role },
+    if (error || !requests) return;
+    return requests;
   });
-  if (error || !data) return;
-  return data;
-}
+
+export const deleteUser = createServerFn({ method: "POST" })
+  .validator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    const { createClient } = await import("./supabase/supabase.server");
+    const supabase = createClient();
+
+    const { error } = await supabase.from("darn_portal_profiles").delete().eq("id", data.id);
+
+    if (error) console.error(error);
+    return { success: true };
+  });
+
+export const createUser = createServerFn({ method: "POST" })
+  .validator((data: CreatedUser) => data)
+  .handler(async ({ data }) => {
+    const { createClient } = await import("./supabase/supabase.server");
+    const supabase = createClient();
+
+    const { data: createUser, error } = await supabase.functions.invoke(
+      "admin-create-user-no-verify",
+      {
+        body: { email: data.email, password: data.password, full_name: data.name, role: data.role },
+      },
+    );
+
+    if (error || !createUser) return;
+    return createUser;
+  });
 
 export async function createRequest(request: Omit<Ticket, "created_by_profile_id">) {
   const {

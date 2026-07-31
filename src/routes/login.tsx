@@ -1,22 +1,21 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LifeBuoy } from "lucide-react";
-import { supabase } from "../supabaseClient";
 import { getLoggedInUserProfile, signIn } from "@/lib/auth";
 import { toast } from "sonner";
 import { redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/login")({
-  beforeLoad: async () => {
-    const profile = await getLoggedInUserProfile();
-    if (profile) {
-      throw redirect({ to: profile.role == "admin" ? "/admin" : "/dashboard" });
-    }
-  },
+  // beforeLoad: async () => {
+  //   const profile = await getLoggedInUserProfile();
+  //   if (profile) {
+  //     throw redirect({ to: profile.role == "admin" ? "/admin" : "/dashboard" });
+  //   }
+  // },
   head: () => ({
     meta: [
       { title: "Sign in — DARN Counselor Portal" },
@@ -33,7 +32,7 @@ function LoginPage() {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const signingIn = await signIn(email, password);
+    const signingIn = await signIn({ data: { email, password } });
 
     if (!signingIn?.user) {
       toast.error("Could not sign in. Please try again.");
