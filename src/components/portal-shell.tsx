@@ -11,7 +11,8 @@ import {
   LogOut,
   LifeBuoy,
 } from "lucide-react";
-import { supabase } from "@/supabaseClient";
+import { createClient } from "@/lib/supabase/client";
+import { signOut } from "@/lib/auth";
 
 interface NavItem {
   to: string;
@@ -44,7 +45,8 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
   const nav = role === "admin" ? adminNav : counselorNav;
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
+    await signOut();
+    navigate({ to: "/login" });
   };
 
   return (
@@ -83,10 +85,7 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
         <div className="border-t p-3 space-y-1">
           <button
             className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground hover:cursor-pointer"
-            onClick={() => {
-              handleSignOut();
-              navigate({ to: "/login" });
-            }}
+            onClick={handleSignOut}
           >
             <LogOut className="h-4 w-4" />
             Sign out

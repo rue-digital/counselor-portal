@@ -35,7 +35,7 @@ function RequestDetailPage() {
 
   useEffect(() => {
     async function getTicket() {
-      const request = await getRequest(id);
+      const request = await getRequest({ data: { id } });
       console.log(request);
 
       if (!request) {

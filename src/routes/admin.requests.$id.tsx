@@ -45,7 +45,7 @@ function AdminRequestDetailPage() {
 
   useEffect(() => {
     async function getTicket() {
-      const request = await getRequest(id);
+      const request = await getRequest({ data: { id } });
       if (!request) {
         toast.error("Failed to load request. Contact site administrator.");
         setLoading(false);

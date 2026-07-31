@@ -86,7 +86,7 @@ function UsersPage() {
   }
 
   const handleDeleteUser = async (id: string) => {
-    const error = await deleteUser(id);
+    const error = await deleteUser({ data: { id } });
     if (error) {
       toast.error("Failed to remove user.");
       return;
@@ -103,7 +103,7 @@ function UsersPage() {
       name: name,
       role: role,
     };
-    const create = await createUser(user);
+    const create = await createUser({ data: { ...user } });
     if (!create) {
       toast.error("Failed to create user.");
       return;
