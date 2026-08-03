@@ -3,11 +3,30 @@ import { StatusBadge } from "@/components/portal-shell";
 import { STATUSES, STATUS_LABELS, formatDate, type AssistanceRequest } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/supabaseClient";
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
-import { Ticket } from "@/lib/auth";
+import {
+  ReactElement,
+  JSXElementConstructor,
+  ReactNode,
+  ReactPortal,
+  useEffect,
+  useState,
+} from "react";
+import { Ticket, getTicketStatusHistory } from "@/lib/auth";
+import { Check } from "lucide-react";
 
+type History = { changed_by_profile_id: string; new_status: string; updated_at: string };
 export function RequestDetail(request: Ticket) {
-  // const reachedStatuses = new Set(request.timeline.map((e) => e.status));
+  const [statusHistory, setStatusHistory] = useState<History[]>([]);
+  const [reachedStatuses, setReachedStatuses] = useState<Set<string> | null>(null);
+
+  useEffect(() => {
+    async function getHistory() {
+      const history = await getTicketStatusHistory({ data: { ticket_id: request.id } });
+      setStatusHistory(history);
+      setReachedStatuses(new Set(history.map((e) => e.new_status)));
+    }
+    getHistory();
+  }, []);
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -43,31 +62,31 @@ export function RequestDetail(request: Ticket) {
             <CardTitle className="text-base">Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            {/* <ol className="space-y-4">
-              {[...request.timeline]
-                .sort((a, b) => a.at.localeCompare(b.at))
+            <ol className="space-y-4">
+              {statusHistory
+                .sort((a, b) => a.updated_at.localeCompare(b.updated_at))
                 .map((evt, idx) => (
                   <li key={idx} className="flex gap-3">
                     <div className="flex flex-col items-center">
                       <div className="h-2.5 w-2.5 rounded-full bg-primary mt-1.5" />
-                      {idx < request.timeline.length - 1 ? (
+                      {idx < statusHistory.length - 1 ? (
                         <div className="flex-1 w-px bg-border my-1" />
                       ) : null}
                     </div>
                     <div className="pb-2 flex-1">
                       <div className="flex items-center gap-2">
-                        <StatusBadge status={evt.status} />
+                        <StatusBadge status={evt.new_status} />
                         <span className="text-xs text-muted-foreground">
-                          {formatDate(evt.at)} · {evt.actor}
+                          {formatDate(evt.updated_at)} · {evt.changed_by_profile_id}
                         </span>
                       </div>
-                      {evt.note ? (
+                      {/* {evt.note ? (
                         <p className="text-sm mt-1 text-foreground/80">{evt.note}</p>
-                      ) : null}
+                      ) : null} */}
                     </div>
                   </li>
                 ))}
-            </ol> */}
+            </ol>
           </CardContent>
         </Card>
       </div>
@@ -78,9 +97,9 @@ export function RequestDetail(request: Ticket) {
             <CardTitle className="text-base">Status timeline</CardTitle>
           </CardHeader>
           <CardContent>
-            {/* <ol className="space-y-3">
+            <ol className="space-y-3">
               {STATUSES.map((s) => {
-                const reached = reachedStatuses.has(s);
+                const reached = reachedStatuses?.has(s);
                 const current = request.status === s;
                 return (
                   <li key={s} className="flex items-center gap-3">
@@ -111,7 +130,7 @@ export function RequestDetail(request: Ticket) {
                   </li>
                 );
               })}
-            </ol> */}
+            </ol>
           </CardContent>
         </Card>
       </div>

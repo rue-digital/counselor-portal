@@ -227,7 +227,39 @@ async function updateTicketStatus(supabase: SupabaseClient, ticket_id: string, s
   return data;
 }
 
-// if any one fails they should all fail. no halfway transformations
+// returns all event types
+async function getAllTicketHistory(supabase: SupabaseClient, ticket_id: string) {
+  const { data, error } = await supabase
+    .from("darn_portal_ticket_history")
+    .select()
+    .eq("ticket_id", ticket_id)
+    .order("updated_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export const getTicketStatusHistory = createServerFn()
+  .validator((data: { ticket_id: string }) => data)
+  .handler(async ({ data }) => {
+    const { createClient } = await import("./supabase/supabase.server");
+    const supabase = createClient();
+
+    const history = await getAllTicketHistory(supabase, data.ticket_id);
+    const status_changed_events = history.filter(
+      (change) => change.event_type === "status_changed" || change.event_type === "created",
+    );
+    // extract only changed_by_profile_id, new_status, updated_at
+    const statusHistory = status_changed_events.map(
+      ({ changed_by_profile_id, new_status, updated_at }) => ({
+        changed_by_profile_id,
+        new_status,
+        updated_at,
+      }),
+    );
+    // instead of changed_by_profile_id, return actor name
+    return statusHistory;
+  });
+
 export const createRequest = createServerFn({ method: "POST" })
   .validator((data: Omit<Ticket, "created_by_profile_id">) => data)
   .handler(async ({ data }) => {
