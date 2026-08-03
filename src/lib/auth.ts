@@ -238,6 +238,17 @@ async function getAllTicketHistory(supabase: SupabaseClient, ticket_id: string) 
   return data;
 }
 
+async function getNameFromID(supabase: SupabaseClient, profile_id: string) {
+  const { data: profile, error } = await supabase
+    .from("darn_portal_profiles")
+    .select("*")
+    .eq("id", profile_id)
+    .single();
+
+  if (error || !profile) throw new Error(error?.message);
+  return profile.full_name;
+}
+
 export const getTicketStatusHistory = createServerFn()
   .validator((data: { ticket_id: string }) => data)
   .handler(async ({ data }) => {
@@ -248,15 +259,19 @@ export const getTicketStatusHistory = createServerFn()
     const status_changed_events = history.filter(
       (change) => change.event_type === "status_changed" || change.event_type === "created",
     );
-    // extract only changed_by_profile_id, new_status, updated_at
-    const statusHistory = status_changed_events.map(
-      ({ changed_by_profile_id, new_status, updated_at }) => ({
-        changed_by_profile_id,
-        new_status,
-        updated_at,
+
+    // keep only changed_by_profile_id, new_status, updated_at
+    const statusHistory = await Promise.all(
+      status_changed_events.map(async ({ changed_by_profile_id, new_status, updated_at }) => {
+        const name = await getNameFromID(supabase, changed_by_profile_id);
+        return {
+          actor_name: name,
+          status: new_status,
+          updated_at: updated_at,
+        };
       }),
     );
-    // instead of changed_by_profile_id, return actor name
+
     return statusHistory;
   });
 

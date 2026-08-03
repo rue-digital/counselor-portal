@@ -14,7 +14,7 @@ import {
 import { Ticket, getTicketStatusHistory } from "@/lib/auth";
 import { Check } from "lucide-react";
 
-type History = { changed_by_profile_id: string; new_status: string; updated_at: string };
+type History = { actor_name: string; status: string; updated_at: string };
 export function RequestDetail(request: Ticket) {
   const [statusHistory, setStatusHistory] = useState<History[]>([]);
   const [reachedStatuses, setReachedStatuses] = useState<Set<string> | null>(null);
@@ -23,7 +23,7 @@ export function RequestDetail(request: Ticket) {
     async function getHistory() {
       const history = await getTicketStatusHistory({ data: { ticket_id: request.id } });
       setStatusHistory(history);
-      setReachedStatuses(new Set(history.map((e) => e.new_status)));
+      setReachedStatuses(new Set(history.map((e) => e.status)));
     }
     getHistory();
   }, []);
@@ -75,9 +75,9 @@ export function RequestDetail(request: Ticket) {
                     </div>
                     <div className="pb-2 flex-1">
                       <div className="flex items-center gap-2">
-                        <StatusBadge status={evt.new_status} />
+                        <StatusBadge status={evt.status} />
                         <span className="text-xs text-muted-foreground">
-                          {formatDate(evt.updated_at)} · {evt.changed_by_profile_id}
+                          {formatDate(evt.updated_at)} · {evt.actor_name}
                         </span>
                       </div>
                       {/* {evt.note ? (
