@@ -107,7 +107,18 @@ export const getAllRequests = createServerFn({ method: "GET" }).handler(async ()
     .order("updated_at", { ascending: false });
 
   if (error) throw new Error(error.message);
-  return data;
+
+  const requests = await Promise.all(
+    data.map(async ({ created_by_profile_id, ...item }) => {
+      const name = await getNameFromID(supabase, created_by_profile_id);
+      return {
+        ...item,
+        created_by_profile_id,
+        counselor: name,
+      };
+    }),
+  );
+  return requests;
 });
 
 export const getLoggedInUserProfile = createServerFn({

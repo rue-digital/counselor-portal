@@ -85,11 +85,12 @@ function AdminBoardPage() {
                       {r.requested_item}
                     </div>
                     <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{r.counselor}</span>
                       <span
                         className={
-                          r.priority === "high"
+                          r.priority === "High"
                             ? "text-rose-600 font-medium"
-                            : r.priority === "medium"
+                            : r.priority === "Medium"
                               ? "text-amber-600"
                               : ""
                         }

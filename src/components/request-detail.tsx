@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/portal-shell";
 import { STATUSES, STATUS_LABELS, formatDate, type AssistanceRequest } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/supabaseClient";
 import {
   ReactElement,
   JSXElementConstructor,
