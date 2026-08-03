@@ -42,7 +42,8 @@ function NewRequestPage() {
     try {
       const formData = new FormData(e.currentTarget);
       const ticketData = Object.fromEntries(formData.entries());
-      await createRequest(ticketData);
+      console.log(ticketData);
+      await createRequest({ data: { ...ticketData } });
 
       setTimeout(() => {
         toast.success("Request submitted", {
@@ -51,6 +52,7 @@ function NewRequestPage() {
         navigate({ to: "/requests" });
       }, 400);
     } catch (error) {
+      console.log(error);
       toast.error("Error creating ticket.");
     } finally {
       setSubmitting(false);

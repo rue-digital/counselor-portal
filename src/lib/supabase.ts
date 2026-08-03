@@ -167,6 +167,54 @@ export type Database = {
           },
         ];
       };
+      darn_portal_ticket_history: {
+        Row: {
+          changed_by_profile_id: string;
+          event_type: Database["public"]["Enums"]["ticket_event_type"];
+          id: string;
+          new_status: Database["public"]["Enums"]["darn_ticket_status"] | null;
+          note: string | null;
+          previous_status: Database["public"]["Enums"]["darn_ticket_status"] | null;
+          ticket_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          changed_by_profile_id: string;
+          event_type: Database["public"]["Enums"]["ticket_event_type"];
+          id?: string;
+          new_status?: Database["public"]["Enums"]["darn_ticket_status"] | null;
+          note?: string | null;
+          previous_status?: Database["public"]["Enums"]["darn_ticket_status"] | null;
+          ticket_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          changed_by_profile_id?: string;
+          event_type?: Database["public"]["Enums"]["ticket_event_type"];
+          id?: string;
+          new_status?: Database["public"]["Enums"]["darn_ticket_status"] | null;
+          note?: string | null;
+          previous_status?: Database["public"]["Enums"]["darn_ticket_status"] | null;
+          ticket_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "darn_portal_ticket_history_changed_by_profile_id_fkey";
+            columns: ["changed_by_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "darn_portal_profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "darn_portal_ticket_history_ticket_id_fkey";
+            columns: ["ticket_id"];
+            isOneToOne: false;
+            referencedRelation: "darn_portal_tickets";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       darn_portal_tickets: {
         Row: {
           assistance_details: string | null;
@@ -330,6 +378,7 @@ export type Database = {
         | "Preschool"
         | "Other";
       status: "submitted" | "withdrawn" | "under review" | "declined" | "approved" | "completed";
+      ticket_event_type: "created" | "status_changed" | "note_added";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -492,6 +541,7 @@ export const Constants = {
         "Other",
       ],
       status: ["submitted", "withdrawn", "under review", "declined", "approved", "completed"],
+      ticket_event_type: ["created", "status_changed", "note_added"],
     },
   },
 } as const;

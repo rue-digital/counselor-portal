@@ -1,9 +1,11 @@
+import { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./supabase";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 export type Profile = Database["public"]["Tables"]["darn_portal_profiles"]["Row"];
 export type Ticket = Database["public"]["Tables"]["darn_portal_tickets"]["Row"];
+export type TicketUpdate = Database["public"]["Tables"]["darn_portal_ticket_history"]["Row"];
 
 type schools = Database["public"]["Enums"]["school"];
 type assistance_type = Database["public"]["Enums"]["darn_ticket_assistance_type"];
@@ -198,26 +200,94 @@ export const createUser = createServerFn({ method: "POST" })
     return createUser;
   });
 
-export async function createRequest(request: Omit<Ticket, "created_by_profile_id">) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+async function getPreviousStatus(supabase: SupabaseClient, ticket_id: string) {
+  const { data, error } = await supabase
+    .from("darn_portal_ticket_history")
+    .select()
+    .eq("ticket_id", ticket_id)
+    .order("updated_at", { ascending: false })
+    .limit(1);
+  if (error) throw new Error(error.message);
+  return data[0].new_status;
+}
 
-  if (!user) return;
+async function insertRequestHistory(supabase: SupabaseClient, data: TicketUpdate) {
+  const { error } = await supabase.from("darn_portal_ticket_history").insert(data);
 
+  if (error) throw new Error(error.message);
+}
+
+async function updateTicketStatus(supabase: SupabaseClient, ticket_id: string, status: string) {
   const { data, error } = await supabase
     .from("darn_portal_tickets")
-    .insert({
-      ...request,
-      created_by_profile_id: user.id,
-    })
-    .select()
-    .single();
-
-  if (error || !data) throw error;
-
+    .update({ status: status })
+    .eq("id", ticket_id)
+    .select();
+  if (error) throw new Error(error.message);
   return data;
 }
+
+// if any one fails they should all fail. no halfway transformations
+export const createRequest = createServerFn({ method: "POST" })
+  .validator((data: Omit<Ticket, "created_by_profile_id">) => data)
+  .handler(async ({ data }) => {
+    const { createClient } = await import("./supabase/supabase.server");
+    const supabase = createClient();
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) throw new Error(userError?.message);
+
+    const { data: submitted, error } = await supabase
+      .from("darn_portal_tickets")
+      .insert({
+        ...data,
+        created_by_profile_id: user?.id,
+      })
+      .select()
+      .single();
+    if (error || !submitted) throw new Error(error?.message);
+
+    await insertRequestHistory(supabase, {
+      ticket_id: submitted.id,
+      changed_by_profile_id: user.id,
+      event_type: "created",
+      previous_status: null,
+      new_status: "submitted",
+    });
+
+    return submitted;
+  });
+
+export const adminChangeStatus = createServerFn({ method: "POST" })
+  .validator((data: { ticket_id: string; new_status: string }) => data)
+  .handler(async ({ data }) => {
+    const { createClient } = await import("./supabase/supabase.server");
+    const supabase = createClient();
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user) throw new Error(userError?.message);
+
+    // create new row in darn_portal_ticket_history
+    const previous_status = await getPreviousStatus(supabase, data.ticket_id);
+
+    await insertRequestHistory(supabase, {
+      ticket_id: data.ticket_id,
+      changed_by_profile_id: user.id,
+      event_type: "status_changed",
+      previous_status: previous_status,
+      new_status: data.new_status,
+    });
+
+    // update row in darn_portal_tickets
+    await updateTicketStatus(supabase, data.ticket_id, data.new_status);
+  });
 
 export function generatePassword(length = 16) {
   const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";

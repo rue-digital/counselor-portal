@@ -14,7 +14,7 @@ import { RequestDetail } from "@/components/request-detail";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import { Ticket, getRequest } from "@/lib/auth";
+import { Ticket, getRequest, adminChangeStatus } from "@/lib/auth";
 import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/admin/requests/$id")({
@@ -94,9 +94,10 @@ function AdminRequestDetailPage() {
               Update status
             </label>
             <Select
-              value={status ?? "null"}
+              value={currentStatus ?? "null"}
               onValueChange={(v) => {
                 setCurrentStatus(v as RequestStatus);
+                adminChangeStatus({ data: { ticket_id: id, new_status: v.toLocaleLowerCase() } });
                 toast.success(`Status updated to ${STATUS_LABELS[v as RequestStatus]}`);
               }}
             >
