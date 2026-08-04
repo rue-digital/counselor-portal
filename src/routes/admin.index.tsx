@@ -3,7 +3,7 @@ import { PortalShell, StatusBadge } from "@/components/portal-shell";
 import { Card } from "@/components/ui/card";
 import { STATUSES, STATUS_LABELS, formatDate, type RequestStatus } from "@/lib/mock-data";
 import { useState, useEffect } from "react";
-import { getAllRequests, type Ticket } from "@/lib/auth";
+import { getAllRequests, type Request } from "@/lib/auth";
 import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/admin/")({
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin/")({
 
 function AdminBoardPage() {
   const { profile } = Route.useRouteContext();
-  const [tickets, setTickets] = useState<Ticket[] | null>(null);
+  const [tickets, setTickets] = useState<Request[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,22 +30,22 @@ function AdminBoardPage() {
     void loadDashboard();
   }, []);
 
-  let byStatus: Record<RequestStatus, Ticket[]>;
+  let byStatus: Record<RequestStatus, Request[]>;
   if (tickets) {
-    byStatus = STATUSES.reduce<Record<RequestStatus, Ticket[]>>(
+    byStatus = STATUSES.reduce<Record<RequestStatus, Request[]>>(
       (acc, s) => {
         acc[s] = tickets.filter((r) => r.status === s);
         return acc;
       },
-      {} as Record<RequestStatus, Ticket[]>,
+      {} as Record<RequestStatus, Request[]>,
     );
   } else {
-    byStatus = STATUSES.reduce<Record<RequestStatus, Ticket[]>>(
+    byStatus = STATUSES.reduce<Record<RequestStatus, Request[]>>(
       (acc, s) => {
         acc[s] = [];
         return acc;
       },
-      {} as Record<RequestStatus, Ticket[]>,
+      {} as Record<RequestStatus, Request[]>,
     );
   }
 
@@ -85,11 +85,12 @@ function AdminBoardPage() {
                       {r.requested_item}
                     </div>
                     <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{r.counselor}</span>
                       <span
                         className={
-                          r.priority === "high"
+                          r.priority === "High"
                             ? "text-rose-600 font-medium"
-                            : r.priority === "medium"
+                            : r.priority === "Medium"
                               ? "text-amber-600"
                               : ""
                         }

@@ -14,7 +14,7 @@ import { RequestDetail } from "@/components/request-detail";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import { Ticket, getRequest } from "@/lib/auth";
+import { Request, getRequest, adminChangeStatus } from "@/lib/auth";
 import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/admin/requests/$id")({
@@ -39,9 +39,9 @@ export const Route = createFileRoute("/admin/requests/$id")({
 function AdminRequestDetailPage() {
   const { profile } = Route.useRouteContext();
   const { id } = Route.useParams();
-  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [ticket, setTicket] = useState<Request | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentStatus, setCurrentStatus] = useState<RequestStatus>(ticket?.status || "submitted");
+  const [currentStatus, setCurrentStatus] = useState<RequestStatus | null>(null);
 
   useEffect(() => {
     async function getTicket() {
@@ -59,7 +59,7 @@ function AdminRequestDetailPage() {
     void getTicket();
   }, [id]);
 
-  if (loading || !ticket) {
+  if (loading || !ticket || !currentStatus) {
     return (
       <PortalShell role={profile.role} title="Request detail">
         <div className="text-sm text-muted-foreground">Loading request...</div>
@@ -94,9 +94,10 @@ function AdminRequestDetailPage() {
               Update status
             </label>
             <Select
-              value={status ?? "null"}
+              value={currentStatus}
               onValueChange={(v) => {
                 setCurrentStatus(v as RequestStatus);
+                adminChangeStatus({ data: { ticket_id: id, new_status: v.toLocaleLowerCase() } });
                 toast.success(`Status updated to ${STATUS_LABELS[v as RequestStatus]}`);
               }}
             >

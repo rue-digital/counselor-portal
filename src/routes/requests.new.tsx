@@ -42,7 +42,7 @@ function NewRequestPage() {
     try {
       const formData = new FormData(e.currentTarget);
       const ticketData = Object.fromEntries(formData.entries());
-      await createRequest(ticketData);
+      await createRequest({ data: { ...ticketData } });
 
       setTimeout(() => {
         toast.success("Request submitted", {
