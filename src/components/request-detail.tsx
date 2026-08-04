@@ -10,11 +10,11 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Ticket, getTicketStatusHistory } from "@/lib/auth";
+import { Request, RequestStatus, getTicketStatusHistory } from "@/lib/auth";
 import { Check } from "lucide-react";
 
 type History = { actor_name: string; status: string; updated_at: string };
-export function RequestDetail(request: Ticket) {
+export function RequestDetail(request: Request) {
   const [statusHistory, setStatusHistory] = useState<History[]>([]);
   const [reachedStatuses, setReachedStatuses] = useState<Set<string> | null>(null);
 
@@ -25,7 +25,7 @@ export function RequestDetail(request: Ticket) {
       setReachedStatuses(new Set(history.map((e) => e.status)));
     }
     getHistory();
-  }, []);
+  }, [request.id, statusHistory]);
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -48,8 +48,8 @@ export function RequestDetail(request: Ticket) {
             <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t">
               <Field label="Category" value={request.assistance_type} />
               <Field label="Urgency" value={request.priority} />
-              {/* <Field label="Client" value={request.client} /> */}
-              {/* <Field label="Counselor" value={request.counselor} /> */}
+              <Field label="Family Code" value={request.family_reference_code} />
+              <Field label="Counselor" value={request.counselor} />
               <Field label="Created" value={formatDate(request.created_at)} />
               <Field label="Updated" value={formatDate(request.updated_at)} />
             </dl>
@@ -74,7 +74,7 @@ export function RequestDetail(request: Ticket) {
                     </div>
                     <div className="pb-2 flex-1">
                       <div className="flex items-center gap-2">
-                        <StatusBadge status={evt.status} />
+                        <StatusBadge status={evt.status as RequestStatus} />
                         <span className="text-xs text-muted-foreground">
                           {formatDate(evt.updated_at)} · {evt.actor_name}
                         </span>
@@ -90,7 +90,7 @@ export function RequestDetail(request: Ticket) {
         </Card>
       </div>
 
-      <div className="space-y-6">
+      {/* <div className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Status timeline</CardTitle>
@@ -132,7 +132,7 @@ export function RequestDetail(request: Ticket) {
             </ol>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
     </div>
   );
 }

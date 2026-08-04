@@ -6,6 +6,11 @@ import { z } from "zod";
 export type Profile = Database["public"]["Tables"]["darn_portal_profiles"]["Row"];
 export type Ticket = Database["public"]["Tables"]["darn_portal_tickets"]["Row"];
 export type TicketUpdate = Database["public"]["Tables"]["darn_portal_ticket_history"]["Row"];
+export type RequestStatus = Database["public"]["Enums"]["darn_ticket_status"];
+
+export type Request = Ticket & {
+  counselor: string;
+};
 
 type schools = Database["public"]["Enums"]["school"];
 type assistance_type = Database["public"]["Enums"]["darn_ticket_assistance_type"];
@@ -172,14 +177,18 @@ export const getRequest = createServerFn({ method: "GET" })
     const { createClient } = await import("./supabase/supabase.server");
     const supabase = createClient();
 
-    const { data: requests, error } = await supabase
+    const { data: request, error } = await supabase
       .from("darn_portal_tickets")
       .select("*")
       .eq("id", data.id)
       .single();
 
-    if (error || !requests) return;
-    return requests;
+    if (error || !request) throw new Error(error?.message);
+    const name = await getNameFromID(supabase, request.created_by_profile_id);
+    return {
+      ...request,
+      counselor: name,
+    };
   });
 
 export const deleteUser = createServerFn({ method: "POST" })

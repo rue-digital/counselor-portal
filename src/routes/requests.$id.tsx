@@ -3,7 +3,7 @@ import { PortalShell } from "@/components/portal-shell";
 import { Button } from "@/components/ui/button";
 import { RequestDetail } from "@/components/request-detail";
 import { ArrowLeft } from "lucide-react";
-import { Ticket, getRequest } from "@/lib/auth";
+import { Request, getRequest } from "@/lib/auth";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { requireRole } from "@/lib/route-auth";
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/requests/$id")({
 function RequestDetailPage() {
   const { profile } = Route.useRouteContext();
   const { id } = Route.useParams();
-  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [ticket, setTicket] = useState<Request | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
