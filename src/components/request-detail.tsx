@@ -13,7 +13,7 @@ import {
 import { Request, RequestStatus, getTicketStatusHistory } from "@/lib/auth";
 import { Check } from "lucide-react";
 
-type History = { actor_name: string; status: string; updated_at: string };
+type History = { actor_name: string; status: string; updated_at: string; note: string };
 export function RequestDetail(request: Request) {
   const [statusHistory, setStatusHistory] = useState<History[]>([]);
   const [reachedStatuses, setReachedStatuses] = useState<Set<string> | null>(null);
@@ -74,14 +74,20 @@ export function RequestDetail(request: Request) {
                     </div>
                     <div className="pb-2 flex-1">
                       <div className="flex items-center gap-2">
-                        <StatusBadge status={evt.status as RequestStatus} />
+                        {evt.status ? (
+                          <StatusBadge status={evt.status as RequestStatus} />
+                        ) : (
+                          <StatusBadge status={"note_added"} />
+                        )}
                         <span className="text-xs text-muted-foreground">
                           {formatDate(evt.updated_at)} · {evt.actor_name}
                         </span>
                       </div>
-                      {/* {evt.note ? (
-                        <p className="text-sm mt-1 text-foreground/80">{evt.note}</p>
-                      ) : null} */}
+                      {evt.note ? (
+                        <p className="text-sm mt-1 text-foreground/80 text-neutral-800">
+                          {evt.note}
+                        </p>
+                      ) : null}
                     </div>
                   </li>
                 ))}

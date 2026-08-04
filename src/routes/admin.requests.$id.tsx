@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PortalShell } from "@/components/portal-shell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -9,13 +10,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { STATUSES, STATUS_LABELS, type RequestStatus } from "@/lib/mock-data";
 import { RequestDetail } from "@/components/request-detail";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import { Request, getRequest, adminChangeStatus } from "@/lib/auth";
+import { Request, getRequest, adminChangeStatus, adminAddNote } from "@/lib/auth";
 import { requireRole } from "@/lib/route-auth";
+import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/admin/requests/$id")({
   beforeLoad: async () => {
@@ -43,6 +54,12 @@ function AdminRequestDetailPage() {
   const [loading, setLoading] = useState(true);
   const [currentStatus, setCurrentStatus] = useState<RequestStatus | null>(null);
 
+  const [openNote, setOpenNote] = useState(false);
+  const [note, setNote] = useState("");
+  const reset = () => {
+    setNote("");
+  };
+
   useEffect(() => {
     async function getTicket() {
       const request = await getRequest({ data: { id } });
@@ -58,6 +75,15 @@ function AdminRequestDetailPage() {
 
     void getTicket();
   }, [id]);
+
+  const handleCreateNote = async () => {
+    try {
+      await adminAddNote({ data: { ticket_id: id, note: note } });
+      toast.success("Note added to request.");
+    } catch (e) {
+      toast.error("Failed to add note.");
+    }
+  };
 
   if (loading || !ticket || !currentStatus) {
     return (
@@ -113,9 +139,60 @@ function AdminRequestDetailPage() {
               </SelectContent>
             </Select>
           </div>
-          <Button variant="outline" onClick={() => toast.info("Note added (mock)")}>
-            Add internal note
-          </Button>
+          <Dialog
+            open={openNote}
+            onOpenChange={(o) => {
+              setOpenNote(o);
+              if (!o) reset();
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4" />
+                Add internal note
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  await handleCreateNote();
+                  reset();
+                }}
+              >
+                <DialogHeader>
+                  <DialogTitle>Add note</DialogTitle>
+                  <DialogDescription>
+                    Notes are viewable to the requesting counselor and all admins.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Textarea
+                      id="note"
+                      rows={3}
+                      name="note"
+                      placeholder="Include any additional details or inquiries."
+                      onChange={(e) => setNote(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setOpenNote(false);
+                      reset();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit">Add note</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
       <RequestDetail {...request} />
