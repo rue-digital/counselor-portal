@@ -7,6 +7,7 @@ import { Request, getRequest } from "@/lib/auth";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { requireRole } from "@/lib/route-auth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const Route = createFileRoute("/requests/$id")({
   beforeLoad: async () => {
@@ -71,7 +72,7 @@ function RequestDetailPage() {
         </Button>
       }
     >
-      <RequestDetail {...ticket} />
+      <RequestDetail role="Counselor" request={ticket} />
     </PortalShell>
   );
 }

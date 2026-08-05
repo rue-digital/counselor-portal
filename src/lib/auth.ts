@@ -276,9 +276,6 @@ export const getTicketStatusHistory = createServerFn()
     const supabase = createClient();
 
     const history = await getAllTicketHistory(supabase, data.ticket_id);
-    // const status_changed_events = history.filter(
-    //   (change) => change.event_type === "status_changed" || change.event_type === "created",
-    // );
 
     // keep only changed_by_profile_id, new_status, updated_at, note
     const statusHistory = await Promise.all(
