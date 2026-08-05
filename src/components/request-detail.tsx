@@ -1,23 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/portal-shell";
-import {
-  STATUSES,
-  STATUS_LABELS,
-  formatDate,
-  type AssistanceRequest,
-  type RequestStatus,
-} from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
-import {
-  ReactElement,
-  JSXElementConstructor,
-  ReactNode,
-  ReactPortal,
-  useEffect,
-  useState,
-} from "react";
+import { STATUSES, STATUS_LABELS, formatDate, type RequestStatus } from "@/lib/mock-data";
+import { useEffect, useState } from "react";
 import { Request, adminAddNote, adminChangeStatus, getTicketStatusHistory } from "@/lib/auth";
-import { Check, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -29,7 +15,6 @@ import {
 } from "./ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "./ui/textarea";
-import { id } from "date-fns/locale";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
