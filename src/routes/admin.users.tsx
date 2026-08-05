@@ -178,7 +178,14 @@ function UsersPage() {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setOpen(false);
+                    reset();
+                  }}
+                >
                   Cancel
                 </Button>
                 <Button type="submit">Create user</Button>

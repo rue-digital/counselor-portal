@@ -71,7 +71,7 @@ function RequestDetailPage() {
         </Button>
       }
     >
-      <RequestDetail {...ticket} />
+      <RequestDetail role="Counselor" request={ticket} />
     </PortalShell>
   );
 }

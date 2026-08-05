@@ -1,22 +1,47 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/portal-shell";
-import { STATUSES, STATUS_LABELS, formatDate, type AssistanceRequest } from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
+import { STATUSES, STATUS_LABELS, formatDate, type RequestStatus } from "@/lib/mock-data";
+import { useEffect, useState } from "react";
+import { Request, adminAddNote, adminChangeStatus, getTicketStatusHistory } from "@/lib/auth";
+import { Plus } from "lucide-react";
 import {
-  ReactElement,
-  JSXElementConstructor,
-  ReactNode,
-  ReactPortal,
-  useEffect,
-  useState,
-} from "react";
-import { Request, RequestStatus, getTicketStatusHistory } from "@/lib/auth";
-import { Check } from "lucide-react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "./ui/textarea";
+import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
-type History = { actor_name: string; status: string; updated_at: string };
-export function RequestDetail(request: Request) {
+type History = { actor_name: string; status: string; updated_at: string; note: string };
+type RequestDetailProps = {
+  role: string;
+  request: Request;
+};
+export function RequestDetail({ role, request }: RequestDetailProps) {
   const [statusHistory, setStatusHistory] = useState<History[]>([]);
   const [reachedStatuses, setReachedStatuses] = useState<Set<string> | null>(null);
+  const [currentStatus, setCurrentStatus] = useState<RequestStatus | null>(request.status);
+
+  const [openNote, setOpenNote] = useState(false);
+  const [note, setNote] = useState("");
+  const reset = () => {
+    setNote("");
+  };
+
+  const handleCreateNote = async () => {
+    try {
+      await adminAddNote({ data: { ticket_id: request.id, note: note } });
+      toast.success("Note added to request.");
+    } catch (e) {
+      toast.error("Failed to add note.");
+    }
+  };
 
   useEffect(() => {
     async function getHistory() {
@@ -25,7 +50,7 @@ export function RequestDetail(request: Request) {
       setReachedStatuses(new Set(history.map((e) => e.status)));
     }
     getHistory();
-  }, [request.id, statusHistory]);
+  }, [request.id, statusHistory, currentStatus]);
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -39,7 +64,7 @@ export function RequestDetail(request: Request) {
                 </div>
                 <CardTitle className="mt-1">{request.requested_item}</CardTitle>
               </div>
-              <StatusBadge status={request.status} />
+              <StatusBadge status={currentStatus ?? "submitted"} />
             </div>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
@@ -74,14 +99,20 @@ export function RequestDetail(request: Request) {
                     </div>
                     <div className="pb-2 flex-1">
                       <div className="flex items-center gap-2">
-                        <StatusBadge status={evt.status as RequestStatus} />
+                        {evt.status ? (
+                          <StatusBadge status={evt.status as RequestStatus} />
+                        ) : (
+                          <StatusBadge status={"note_added"} />
+                        )}
                         <span className="text-xs text-muted-foreground">
                           {formatDate(evt.updated_at)} · {evt.actor_name}
                         </span>
                       </div>
-                      {/* {evt.note ? (
-                        <p className="text-sm mt-1 text-foreground/80">{evt.note}</p>
-                      ) : null} */}
+                      {evt.note ? (
+                        <p className="text-sm mt-1 text-foreground/80 text-neutral-800">
+                          {evt.note}
+                        </p>
+                      ) : null}
                     </div>
                   </li>
                 ))}
@@ -90,49 +121,100 @@ export function RequestDetail(request: Request) {
         </Card>
       </div>
 
-      {/* <div className="space-y-6">
+      <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Status timeline</CardTitle>
+            <CardTitle className="text-base">{role} actions</CardTitle>
           </CardHeader>
           <CardContent>
-            <ol className="space-y-3">
-              {STATUSES.map((s) => {
-                const reached = reachedStatuses?.has(s);
-                const current = request.status === s;
-                return (
-                  <li key={s} className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        "h-6 w-6 rounded-full border flex items-center justify-center text-xs",
-                        current
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : reached
-                            ? "bg-muted border-border text-foreground"
-                            : "border-dashed border-border text-muted-foreground",
-                      )}
-                    >
-                      {reached ? <Check className="h-3.5 w-3.5" /> : null}
+            {role === "Admin" ? (
+              <div className="space-y-1">
+                <label className="text-xs text-muted-foreground uppercase tracking-wide">
+                  Update status
+                </label>
+                <Select
+                  value={currentStatus as string}
+                  onValueChange={(v) => {
+                    setCurrentStatus(v as RequestStatus);
+                    adminChangeStatus({
+                      data: { ticket_id: request.id, new_status: v.toLocaleLowerCase() },
+                    });
+                    toast.success(`Status updated to ${STATUS_LABELS[v as RequestStatus]}`);
+                  }}
+                >
+                  <SelectTrigger className="w-42 mb-10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUSES.map((s) =>
+                      s !== "note_added" ? (
+                        <SelectItem key={s} value={s}>
+                          {STATUS_LABELS[s]}
+                        </SelectItem>
+                      ) : null,
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
+            <Dialog
+              open={openNote}
+              onOpenChange={(o) => {
+                setOpenNote(o);
+                if (!o) reset();
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4" />
+                  Add internal note
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    await handleCreateNote();
+                    reset();
+                    setOpenNote(false);
+                  }}
+                >
+                  <DialogHeader>
+                    <DialogTitle>Add note</DialogTitle>
+                    <DialogDescription>
+                      Notes are viewable by the requesting counselor and all admins.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Textarea
+                        id="note"
+                        rows={3}
+                        name="note"
+                        placeholder="Include any additional details or inquiries."
+                        onChange={(e) => setNote(e.target.value)}
+                      />
                     </div>
-                    <span
-                      className={cn(
-                        "text-sm",
-                        current
-                          ? "font-medium"
-                          : reached
-                            ? "text-foreground"
-                            : "text-muted-foreground",
-                      )}
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setOpenNote(false);
+                        reset();
+                      }}
                     >
-                      {STATUS_LABELS[s]}
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
+                      Cancel
+                    </Button>
+                    <Button type="submit">Add note</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </CardContent>
         </Card>
-      </div> */}
+      </div>
     </div>
   );
 }

@@ -276,18 +276,16 @@ export const getTicketStatusHistory = createServerFn()
     const supabase = createClient();
 
     const history = await getAllTicketHistory(supabase, data.ticket_id);
-    const status_changed_events = history.filter(
-      (change) => change.event_type === "status_changed" || change.event_type === "created",
-    );
 
-    // keep only changed_by_profile_id, new_status, updated_at
+    // keep only changed_by_profile_id, new_status, updated_at, note
     const statusHistory = await Promise.all(
-      status_changed_events.map(async ({ changed_by_profile_id, new_status, updated_at }) => {
+      history.map(async ({ changed_by_profile_id, new_status, updated_at, note }) => {
         const name = await getNameFromID(supabase, changed_by_profile_id);
         return {
           actor_name: name,
           status: new_status,
           updated_at: updated_at,
+          note,
         };
       }),
     );
@@ -327,6 +325,29 @@ export const createRequest = createServerFn({ method: "POST" })
     });
 
     return submitted;
+  });
+
+export const adminAddNote = createServerFn({ method: "POST" })
+  .validator((data: { ticket_id: string; note: string }) => data)
+  .handler(async ({ data }) => {
+    const { createClient } = await import("./supabase/supabase.server");
+    const supabase = createClient();
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) throw new Error(userError?.message);
+
+    await insertRequestHistory(supabase, {
+      ticket_id: data.ticket_id,
+      changed_by_profile_id: user.id,
+      event_type: "note_added",
+      previous_status: null,
+      new_status: null,
+      note: data.note,
+    });
   });
 
 export const adminChangeStatus = createServerFn({ method: "POST" })

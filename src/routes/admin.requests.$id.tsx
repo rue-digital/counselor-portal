@@ -1,20 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PortalShell } from "@/components/portal-shell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { STATUSES, STATUS_LABELS, type RequestStatus } from "@/lib/mock-data";
 import { RequestDetail } from "@/components/request-detail";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import { Request, getRequest, adminChangeStatus } from "@/lib/auth";
+import { Request, getRequest } from "@/lib/auth";
 import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/admin/requests/$id")({
@@ -41,7 +32,6 @@ function AdminRequestDetailPage() {
   const { id } = Route.useParams();
   const [ticket, setTicket] = useState<Request | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentStatus, setCurrentStatus] = useState<RequestStatus | null>(null);
 
   useEffect(() => {
     async function getTicket() {
@@ -52,23 +42,19 @@ function AdminRequestDetailPage() {
         return;
       }
       setTicket(request);
-      setCurrentStatus(request.status);
       setLoading(false);
     }
 
     void getTicket();
   }, [id]);
 
-  if (loading || !ticket || !currentStatus) {
+  if (loading || !ticket) {
     return (
       <PortalShell role={profile.role} title="Request detail">
         <div className="text-sm text-muted-foreground">Loading request...</div>
       </PortalShell>
     );
   }
-
-  const { status, ...react } = ticket;
-  const request = { ...react, status: currentStatus };
 
   return (
     <PortalShell
@@ -84,41 +70,7 @@ function AdminRequestDetailPage() {
         </Button>
       }
     >
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-base">Admin actions</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap items-end gap-3">
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground uppercase tracking-wide">
-              Update status
-            </label>
-            <Select
-              value={currentStatus}
-              onValueChange={(v) => {
-                setCurrentStatus(v as RequestStatus);
-                adminChangeStatus({ data: { ticket_id: id, new_status: v.toLocaleLowerCase() } });
-                toast.success(`Status updated to ${STATUS_LABELS[v as RequestStatus]}`);
-              }}
-            >
-              <SelectTrigger className="w-56">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUSES.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {STATUS_LABELS[s]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <Button variant="outline" onClick={() => toast.info("Note added (mock)")}>
-            Add internal note
-          </Button>
-        </CardContent>
-      </Card>
-      <RequestDetail {...request} />
+      <RequestDetail role="Admin" request={ticket} />
     </PortalShell>
   );
 }
