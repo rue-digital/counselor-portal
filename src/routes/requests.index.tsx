@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PortalShell, StatusBadge } from "@/components/portal-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,6 @@ function MyRequestsPage() {
   const [q, setQ] = useState("");
   const [tickets, setTickets] = useState<Ticket[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadDashboard() {
@@ -90,21 +89,42 @@ function MyRequestsPage() {
           </TableHeader>
           <TableBody>
             {tickets?.map((r) => (
-              <TableRow
-                key={r.id}
-                className="cursor-pointer"
-                id={r.id}
-                onClick={() => navigate({ to: "/requests/$id", params: { id: r.id } })}
-              >
-                <TableCell className="font-mono text-xs">{"REQ-" + r.id.slice(0, 8)}</TableCell>
-                <TableCell className="font-medium">{r.requested_item}</TableCell>
-                <TableCell>{r.family_reference_code}</TableCell>
-                <TableCell>{r.assistance_type}</TableCell>
-                <TableCell>{r.priority}</TableCell>
-                <TableCell>
-                  <StatusBadge status={r.status} />
+              <TableRow key={r.id} className="cursor-pointer" id={r.id}>
+                <TableCell className="font-mono text-xs">
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
+                    {"REQ-" + r.id.slice(0, 8)}
+                  </Link>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{formatDate(r.updated_at)}</TableCell>
+                <TableCell className="font-medium">
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
+                    {r.requested_item}
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
+                    {r.family_reference_code}
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
+                    {r.assistance_type}
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
+                    {r.priority}
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
+                    <StatusBadge status={r.status} />
+                  </Link>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
+                    {formatDate(r.updated_at)}
+                  </Link>
+                </TableCell>
               </TableRow>
             ))}
             {tickets?.length === 0 ? (
