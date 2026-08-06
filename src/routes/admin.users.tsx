@@ -67,7 +67,7 @@ function UsersPage() {
     setRole("counselor");
   };
 
-  const [users, setUsers] = useState<Profile[] | null>(null);
+  const [users, setUsers] = useState<Profile[]>([]);
   async function loadUsers() {
     const allUsers = await getAllUsers();
     if (allUsers) setUsers(allUsers);
@@ -77,22 +77,14 @@ function UsersPage() {
     void loadUsers();
   }, []);
 
-  if (users === null) {
-    return (
-      <PortalShell role={profile.role} title="Users">
-        <div className="text-sm text-muted-foreground">Loading users...</div>
-      </PortalShell>
-    );
-  }
-
   const handleDeleteUser = async (id: string) => {
-    const error = await deleteUser({ data: { id } });
-    if (error) {
+    try {
+      await deleteUser({ data: { id } });
+      setUsers((prev) => prev.filter((x) => x.id !== id));
+      toast.success("User deleted.");
+    } catch (error) {
       toast.error("Failed to remove user.");
-      return;
     }
-    setUsers(users.filter((x) => x.id !== id));
-    toast.success("User removed.");
   };
 
   const handleCreateUser = async () => {
