@@ -4,8 +4,7 @@ export type RequestStatus =
   | "approved"
   | "fulfilled"
   | "closed"
-  | "rejected"
-  | "note_added";
+  | "rejected";
 
 export const STATUSES: RequestStatus[] = [
   "submitted",
@@ -14,7 +13,6 @@ export const STATUSES: RequestStatus[] = [
   "fulfilled",
   "closed",
   "rejected",
-  "note_added",
 ];
 
 export const STATUS_LABELS: Record<RequestStatus, string> = {
@@ -24,7 +22,6 @@ export const STATUS_LABELS: Record<RequestStatus, string> = {
   fulfilled: "Fulfilled",
   closed: "Closed",
   rejected: "Rejected",
-  note_added: "Note Added",
 };
 
 export const STATUS_STYLES: Record<RequestStatus, string> = {
@@ -34,6 +31,16 @@ export const STATUS_STYLES: Record<RequestStatus, string> = {
   fulfilled: "bg-violet-100 text-violet-800 border-violet-200",
   closed: "bg-slate-200 text-slate-800 border-slate-300",
   rejected: "bg-rose-100 text-rose-800 border-rose-200",
+};
+
+export type HistoryStatus = RequestStatus | "note_added";
+export const HISTORY_STATUSES: HistoryStatus[] = [...STATUSES, "note_added"];
+export const HISTORY_STATUS_LABELS: Record<HistoryStatus, string> = {
+  ...STATUS_LABELS,
+  note_added: "Note Added",
+};
+export const HISTORY_STATUS_STYLES: Record<HistoryStatus, string> = {
+  ...STATUS_STYLES,
   note_added: "bg-white-200 text-neutral-800 border-neutral-300",
 };
 
