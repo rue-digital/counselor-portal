@@ -199,7 +199,7 @@ export const deleteUser = createServerFn({ method: "POST" })
 
     const { error } = await supabase.from("darn_portal_profiles").delete().eq("id", data.id);
 
-    if (error) console.error(error);
+    if (error) throw new Error(error.message);
     return { success: true };
   });
 
