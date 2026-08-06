@@ -1,7 +1,14 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { STATUS_LABELS, STATUS_STYLES, type RequestStatus } from "@/lib/mock-data";
+import {
+  HISTORY_STATUS_LABELS,
+  HISTORY_STATUS_STYLES,
+  HistoryStatus,
+  STATUS_LABELS,
+  STATUS_STYLES,
+  type RequestStatus,
+} from "@/lib/mock-data";
 import {
   LayoutDashboard,
   FilePlus2,
@@ -108,15 +115,15 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
   );
 }
 
-export function StatusBadge({ status }: { status: RequestStatus }) {
+export function StatusBadge({ status }: { status: HistoryStatus }) {
   return (
     <span
       className={cn(
         "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
-        STATUS_STYLES[status],
+        HISTORY_STATUS_STYLES[status],
       )}
     >
-      {STATUS_LABELS[status]}
+      {HISTORY_STATUS_LABELS[status]}
     </span>
   );
 }

@@ -146,13 +146,11 @@ export function RequestDetail({ role, request }: RequestDetailProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {STATUSES.map((s) =>
-                      s !== "note_added" ? (
-                        <SelectItem key={s} value={s}>
-                          {STATUS_LABELS[s]}
-                        </SelectItem>
-                      ) : null,
-                    )}
+                    {STATUSES.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {STATUS_LABELS[s]}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
