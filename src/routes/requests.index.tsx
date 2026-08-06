@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PortalShell, StatusBadge } from "@/components/portal-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ function MyRequestsPage() {
   const [q, setQ] = useState("");
   const [tickets, setTickets] = useState<Ticket[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadDashboard() {
@@ -89,17 +90,14 @@ function MyRequestsPage() {
           </TableHeader>
           <TableBody>
             {tickets?.map((r) => (
-              <TableRow key={r.id} className="cursor-pointer">
-                <TableCell className="font-mono text-xs">
-                  <Link to="/requests/$id" params={{ id: r.id }}>
-                    {"REQ-" + r.id.slice(0, 8)}
-                  </Link>
-                </TableCell>
-                <TableCell className="font-medium">
-                  <Link to="/requests/$id" params={{ id: r.id }}>
-                    {r.requested_item}
-                  </Link>
-                </TableCell>
+              <TableRow
+                key={r.id}
+                className="cursor-pointer"
+                id={r.id}
+                onClick={() => navigate({ to: "/requests/$id", params: { id: r.id } })}
+              >
+                <TableCell className="font-mono text-xs">{"REQ-" + r.id.slice(0, 8)}</TableCell>
+                <TableCell className="font-medium">{r.requested_item}</TableCell>
                 <TableCell>{r.family_reference_code}</TableCell>
                 <TableCell>{r.assistance_type}</TableCell>
                 <TableCell>{r.priority}</TableCell>
