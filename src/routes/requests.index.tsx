@@ -89,24 +89,42 @@ function MyRequestsPage() {
           </TableHeader>
           <TableBody>
             {tickets?.map((r) => (
-              <TableRow key={r.id} className="cursor-pointer">
+              <TableRow key={r.id} className="cursor-pointer" id={r.id}>
                 <TableCell className="font-mono text-xs">
-                  <Link to="/requests/$id" params={{ id: r.id }}>
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
                     {"REQ-" + r.id.slice(0, 8)}
                   </Link>
                 </TableCell>
                 <TableCell className="font-medium">
-                  <Link to="/requests/$id" params={{ id: r.id }}>
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
                     {r.requested_item}
                   </Link>
                 </TableCell>
-                <TableCell>{r.family_reference_code}</TableCell>
-                <TableCell>{r.assistance_type}</TableCell>
-                <TableCell>{r.priority}</TableCell>
                 <TableCell>
-                  <StatusBadge status={r.status} />
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
+                    {r.family_reference_code}
+                  </Link>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{formatDate(r.updated_at)}</TableCell>
+                <TableCell>
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
+                    {r.assistance_type}
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
+                    {r.priority}
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
+                    <StatusBadge status={r.status} />
+                  </Link>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
+                    {formatDate(r.updated_at)}
+                  </Link>
+                </TableCell>
               </TableRow>
             ))}
             {tickets?.length === 0 ? (
