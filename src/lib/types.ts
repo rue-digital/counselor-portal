@@ -1,12 +1,9 @@
 import type { Database } from "./supabase";
-type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export type Profile = Database["public"]["Tables"]["darn_portal_profiles"]["Row"];
 export type Ticket = Database["public"]["Tables"]["darn_portal_tickets"]["Row"];
-export type TicketUpdate = MakeOptional<
-  Database["public"]["Tables"]["darn_portal_ticket_history"]["Row"],
-  "note" | "updated_at" | "id"
->;
+export type TicketInsert = Database["public"]["Tables"]["darn_portal_tickets"]["Insert"];
+export type TicketUpdate = Database["public"]["Tables"]["darn_portal_ticket_history"]["Insert"];
 export type RequestStatus = Database["public"]["Enums"]["darn_ticket_status"];
 
 export type Request = Ticket & {

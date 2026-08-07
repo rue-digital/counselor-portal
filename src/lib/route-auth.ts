@@ -1,5 +1,6 @@
 import { redirect } from "@tanstack/react-router";
-import { getLoggedInUserProfile, type Profile } from "./auth.server";
+import { getLoggedInUserProfile } from "./auth.server";
+import { Profile } from "./types";
 
 export async function requireAuth(): Promise<Profile> {
   const profile = await getLoggedInUserProfile();

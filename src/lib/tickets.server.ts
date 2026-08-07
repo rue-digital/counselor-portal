@@ -1,6 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { createServerFn } from "@tanstack/react-start";
-import { RequestStatus, Ticket, TicketUpdate } from "./types";
+import { RequestStatus, Ticket, TicketInsert, TicketUpdate } from "./types";
 import { getNameFromID } from "./profiles.server";
 
 async function updateTicketStatus(supabase: SupabaseClient, ticket_id: string, status: string) {
@@ -86,14 +86,7 @@ export const getRequest = createServerFn({ method: "GET" })
   });
 
 export const createRequest = createServerFn({ method: "POST" })
-  .validator(
-    (
-      data: Omit<
-        Ticket,
-        "id" | "created_by_profile_id" | "event_type" | "updated_at" | "created_at" | "needed_by"
-      >,
-    ) => data,
-  )
+  .validator((data: Omit<TicketInsert, "created_by_profile_id">) => data)
   .handler(async ({ data }) => {
     const { createClient } = await import("./supabase/supabase.server");
     const supabase = createClient();

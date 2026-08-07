@@ -19,7 +19,7 @@ import {
   SCHOOL_VALUES,
   ASSISTANCE_TYPE_VALUES,
   ASSISTANCE_REASON_VALUES,
-  Ticket,
+  TicketInsert,
 } from "@/lib/types";
 import { createRequest } from "@/lib/tickets.server";
 
@@ -49,14 +49,14 @@ function NewRequestPage() {
       const ticketData = {
         requested_item: String(formData.get("requested_item")),
         family_reference_code: String(formData.get("family_reference_code")),
-        school_name: formData.get("school_name") as Ticket["school_name"],
-        assistance_type: formData.get("assistance_type") as Ticket["assistance_type"],
-        assistance_reason: formData.get("assistance_reason") as Ticket["assistance_reason"],
+        school_name: formData.get("school_name") as TicketInsert["school_name"],
+        assistance_type: formData.get("assistance_type") as TicketInsert["assistance_type"],
+        assistance_reason: formData.get("assistance_reason") as TicketInsert["assistance_reason"],
         assistance_details: String(formData.get("assistance_details")),
         past_assistance: String(formData.get("past_assistance")),
         request_details: String(formData.get("request_details")),
-        priority: formData.get("priority") as Ticket["priority"],
-        status: "submitted" as Ticket["status"],
+        priority: formData.get("priority") as TicketInsert["priority"],
+        status: "submitted" as TicketInsert["status"],
       };
       await createRequest({ data: ticketData });
 
