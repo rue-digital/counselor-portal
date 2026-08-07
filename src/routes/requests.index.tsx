@@ -14,11 +14,9 @@ import {
 import { formatDate } from "@/lib/mock-data";
 import { FilePlus2 } from "lucide-react";
 import { useState, useEffect } from "react";
-import type { Database } from "../lib/supabase";
-import { getAllRequests } from "@/lib/auth";
+import { Ticket } from "@/lib/types";
+import { getAllRequests } from "@/lib/tickets.server";
 import { requireRole } from "@/lib/route-auth";
-
-type Ticket = Database["public"]["Tables"]["darn_portal_tickets"]["Row"];
 
 export const Route = createFileRoute("/requests/")({
   beforeLoad: async () => {

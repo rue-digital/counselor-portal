@@ -5,7 +5,8 @@ import { RequestDetail } from "@/components/request-detail";
 import { ArrowLeft, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import { Request, getRequest } from "@/lib/auth";
+import { Request } from "@/lib/types";
+import { getRequest } from "@/lib/tickets.server";
 import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/admin/requests/$id")({

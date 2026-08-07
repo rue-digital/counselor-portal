@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { STATUSES, STATUS_LABELS, formatDate } from "@/lib/mock-data";
 import { FilePlus2, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
-import { getAllRequests, Ticket } from "@/lib/auth";
+import { getAllRequests } from "@/lib/tickets.server";
+import { Ticket } from "@/lib/types";
 import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/dashboard")({

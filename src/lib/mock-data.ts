@@ -44,60 +44,6 @@ export const HISTORY_STATUS_STYLES: Record<HistoryStatus, string> = {
   note_added: "bg-white-200 text-neutral-800 border-neutral-300",
 };
 
-export interface TimelineEvent {
-  status: RequestStatus;
-  at: string;
-  note?: string;
-  actor: string;
-}
-
-export interface AssistanceRequest {
-  // timeline: TimelineEvent[];
-  created_at: string;
-  created_by_profile_id: string;
-  description: string;
-  family_reference_code: string | null;
-  id: string;
-  needed_by: string | null;
-  priority: "low" | "medium" | "high" | "urgent";
-  request_type: string;
-  status: "submitted" | "in_review" | "approved" | "fulfilled" | "closed" | "rejected";
-  title: string;
-  updated_at: string;
-}
-
-export interface PortalUser {
-  id: string;
-  name: string;
-  email: string;
-  role: "counselor" | "admin";
-  createdAt: string;
-}
-
-export const mockUsers: PortalUser[] = [
-  {
-    id: "U-01",
-    name: "Jordan Reyes",
-    email: "jordan@portal.test",
-    role: "counselor",
-    createdAt: "2026-04-02T10:00:00Z",
-  },
-  {
-    id: "U-02",
-    name: "Sam Chen",
-    email: "sam@portal.test",
-    role: "counselor",
-    createdAt: "2026-05-11T10:00:00Z",
-  },
-  {
-    id: "U-03",
-    name: "Alex Morgan",
-    email: "alex@portal.test",
-    role: "admin",
-    createdAt: "2026-03-01T10:00:00Z",
-  },
-];
-
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
     month: "short",

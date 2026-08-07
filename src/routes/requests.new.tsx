@@ -15,8 +15,13 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { requireRole } from "@/lib/route-auth";
-import { SCHOOL_VALUES, ASSISTANCE_TYPE_VALUES, ASSISTANCE_REASON_VALUES } from "@/lib/auth";
-import { createRequest } from "@/lib/auth";
+import {
+  SCHOOL_VALUES,
+  ASSISTANCE_TYPE_VALUES,
+  ASSISTANCE_REASON_VALUES,
+  TicketInsert,
+} from "@/lib/types";
+import { createRequest } from "@/lib/tickets.server";
 
 export const Route = createFileRoute("/requests/new")({
   beforeLoad: async () => {
@@ -41,8 +46,19 @@ function NewRequestPage() {
     setSubmitting(true);
     try {
       const formData = new FormData(e.currentTarget);
-      const ticketData = Object.fromEntries(formData.entries());
-      await createRequest({ data: { ...ticketData } });
+      const ticketData = {
+        requested_item: String(formData.get("requested_item")),
+        family_reference_code: String(formData.get("family_reference_code")),
+        school_name: formData.get("school_name") as TicketInsert["school_name"],
+        assistance_type: formData.get("assistance_type") as TicketInsert["assistance_type"],
+        assistance_reason: formData.get("assistance_reason") as TicketInsert["assistance_reason"],
+        assistance_details: String(formData.get("assistance_details")),
+        past_assistance: String(formData.get("past_assistance")),
+        request_details: String(formData.get("request_details")),
+        priority: formData.get("priority") as TicketInsert["priority"],
+        status: "submitted" as TicketInsert["status"],
+      };
+      await createRequest({ data: ticketData });
 
       setTimeout(() => {
         toast.success("Request submitted", {
@@ -67,9 +83,9 @@ function NewRequestPage() {
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="title">What does the family need?</Label>
+                <Label htmlFor="requested_item">What does the family need?</Label>
                 <Input
-                  id="title"
+                  id="requested_item"
                   type="text"
                   required
                   placeholder="Example: Kroger gift card, electric bill payment, twin mattress, bicycle"
