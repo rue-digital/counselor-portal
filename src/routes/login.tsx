@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LifeBuoy } from "lucide-react";
-import { getLoggedInUserProfile, signIn } from "@/lib/auth";
+import { getLoggedInUserProfile, signIn } from "@/lib/auth.server";
 import { toast } from "sonner";
 import { redirect } from "@tanstack/react-router";
 

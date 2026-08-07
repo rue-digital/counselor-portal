@@ -3,7 +3,8 @@ import { PortalShell, StatusBadge } from "@/components/portal-shell";
 import { Card } from "@/components/ui/card";
 import { STATUSES, STATUS_LABELS, formatDate, type RequestStatus } from "@/lib/mock-data";
 import { useState, useEffect } from "react";
-import { getAllRequests, type Request } from "@/lib/auth";
+import { getAllRequests } from "@/lib/tickets.server";
+import type { Request } from "@/lib/types";
 import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/admin/")({

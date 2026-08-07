@@ -32,14 +32,8 @@ import { formatDate } from "@/lib/mock-data";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import {
-  Profile,
-  deleteUser,
-  generatePassword,
-  getAllUsers,
-  CreatedUser,
-  createUser,
-} from "@/lib/auth";
+import { Profile, CreatedUser } from "@/lib/types";
+import { deleteUser, getAllUsers, createUser, generatePassword } from "@/lib/profiles.server";
 import { requireRole } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/admin/users")({

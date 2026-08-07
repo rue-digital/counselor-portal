@@ -2,7 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/portal-shell";
 import { STATUSES, STATUS_LABELS, formatDate, type RequestStatus } from "@/lib/mock-data";
 import { useEffect, useState } from "react";
-import { Request, adminAddNote, adminChangeStatus, getTicketStatusHistory } from "@/lib/auth";
+import { Request } from "@/lib/types";
+import { adminAddNote, adminChangeStatus, getTicketStatusHistory } from "@/lib/tickets.server";
 import { Plus } from "lucide-react";
 import {
   Dialog,
@@ -73,7 +74,7 @@ export function RequestDetail({ role, request }: RequestDetailProps) {
             <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t">
               <Field label="Category" value={request.assistance_type} />
               <Field label="Urgency" value={request.priority} />
-              <Field label="Family Code" value={request.family_reference_code} />
+              <Field label="Family Code" value={request.family_reference_code || ""} />
               <Field label="Counselor" value={request.counselor} />
               <Field label="Created" value={formatDate(request.created_at)} />
               <Field label="Updated" value={formatDate(request.updated_at)} />

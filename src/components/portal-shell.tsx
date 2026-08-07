@@ -1,14 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import {
-  HISTORY_STATUS_LABELS,
-  HISTORY_STATUS_STYLES,
-  HistoryStatus,
-  STATUS_LABELS,
-  STATUS_STYLES,
-  type RequestStatus,
-} from "@/lib/mock-data";
+import { HISTORY_STATUS_LABELS, HISTORY_STATUS_STYLES, HistoryStatus } from "@/lib/mock-data";
 import {
   LayoutDashboard,
   FilePlus2,
@@ -18,8 +11,7 @@ import {
   LogOut,
   LifeBuoy,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { signOut } from "@/lib/auth";
+import { signOut } from "@/lib/auth.server";
 
 interface NavItem {
   to: string;
