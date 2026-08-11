@@ -247,7 +247,7 @@ export type Database = {
           request_details: string;
           requested_item: string;
           school_name?: Database["public"]["Enums"]["school"];
-          status?: Database["public"]["Enums"]["darn_ticket_status"];
+          status: Database["public"]["Enums"]["darn_ticket_status"];
           updated_at?: string;
         };
         Update: {
@@ -361,13 +361,7 @@ export type Database = {
         | "Household Items"
         | "Other";
       darn_ticket_priority: "Low" | "Medium" | "High" | "Urgent";
-      darn_ticket_status:
-        | "submitted"
-        | "in_review"
-        | "approved"
-        | "fulfilled"
-        | "closed"
-        | "rejected";
+      darn_ticket_status: "submitted" | "in_review" | "approved" | "rejected" | "fulfilled";
       roles: "admin" | "counselor";
       school:
         | "Bexley High School"
@@ -529,7 +523,7 @@ export const Constants = {
         "Other",
       ],
       darn_ticket_priority: ["Low", "Medium", "High", "Urgent"],
-      darn_ticket_status: ["submitted", "in_review", "approved", "fulfilled", "closed", "rejected"],
+      darn_ticket_status: ["submitted", "in_review", "approved", "rejected", "fulfilled"],
       roles: ["admin", "counselor"],
       school: [
         "Bexley High School",

@@ -1,18 +1,11 @@
-export type RequestStatus =
-  | "submitted"
-  | "in_review"
-  | "approved"
-  | "fulfilled"
-  | "closed"
-  | "rejected";
+export type RequestStatus = "submitted" | "in_review" | "approved" | "fulfilled" | "rejected";
 
 export const STATUSES: RequestStatus[] = [
   "submitted",
   "in_review",
   "approved",
-  "fulfilled",
-  "closed",
   "rejected",
+  "fulfilled",
 ];
 
 export const STATUS_LABELS: Record<RequestStatus, string> = {
@@ -20,7 +13,6 @@ export const STATUS_LABELS: Record<RequestStatus, string> = {
   in_review: "In Review",
   approved: "Approved",
   fulfilled: "Fulfilled",
-  closed: "Closed",
   rejected: "Rejected",
 };
 
@@ -29,7 +21,6 @@ export const STATUS_STYLES: Record<RequestStatus, string> = {
   in_review: "bg-amber-100 text-amber-800 border-amber-200",
   approved: "bg-emerald-100 text-emerald-800 border-emerald-200",
   fulfilled: "bg-violet-100 text-violet-800 border-violet-200",
-  closed: "bg-slate-200 text-slate-800 border-slate-300",
   rejected: "bg-rose-100 text-rose-800 border-rose-200",
 };
 

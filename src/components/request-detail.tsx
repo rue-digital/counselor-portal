@@ -166,7 +166,7 @@ export function RequestDetail({ role, request }: RequestDetailProps) {
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="h-4 w-4" />
-                  Add internal note
+                  Add note
                 </Button>
               </DialogTrigger>
               <DialogContent>
