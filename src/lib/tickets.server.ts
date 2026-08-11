@@ -65,6 +65,31 @@ export const getAllRequests = createServerFn({ method: "GET" }).handler(async ()
   return requests;
 });
 
+export const getRequestsByStatus = createServerFn({ method: "GET" })
+  .validator((data: { status: string }) => data)
+  .handler(async ({ data }) => {
+    const { createClient } = await import("./supabase/supabase.server");
+    const supabase = createClient();
+
+    const { data: tickets, error } = await supabase
+      .from("darn_portal_tickets")
+      .select()
+      .eq("status", data.status);
+
+    if (error) throw new Error(error.message);
+    const requests = await Promise.all(
+      tickets.map(async ({ created_by_profile_id, ...item }) => {
+        const name = await getNameFromID(supabase, created_by_profile_id);
+        return {
+          ...item,
+          created_by_profile_id,
+          counselor: name,
+        };
+      }),
+    );
+    return requests;
+  });
+
 export const getRequest = createServerFn({ method: "GET" })
   .validator((data: { id: string }) => data)
   .handler(async ({ data }) => {

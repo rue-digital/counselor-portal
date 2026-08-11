@@ -66,13 +66,6 @@ function MyRequestsPage() {
       }
     >
       <Card className="p-4">
-        <div className="mb-4 max-w-sm">
-          <Input
-            placeholder="Search by title, client, or ID..."
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-          />
-        </div>
         <Table>
           <TableHeader>
             <TableRow>
