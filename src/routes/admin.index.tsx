@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { getAllRequests } from "@/lib/tickets.server";
 import type { Request } from "@/lib/types";
 import { requireRole } from "@/lib/route-auth";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/")({
   beforeLoad: async () => {
@@ -15,6 +16,8 @@ export const Route = createFileRoute("/admin/")({
   head: () => ({ meta: [{ title: "Request Board — Admin" }] }),
   component: AdminBoardPage,
 });
+
+const TOP_N_TICKETS = 4;
 
 function AdminBoardPage() {
   const { profile } = Route.useRouteContext();
@@ -69,14 +72,17 @@ function AdminBoardPage() {
           <div key={status} className="flex flex-col min-w-0">
             <div className="flex items-center justify-between mb-2 px-1">
               <div className="flex items-center gap-2">
-                <StatusBadge status={status} />
+                <Link to="/admin/$id" params={{ id: status }}>
+                  {" "}
+                  <StatusBadge status={status} />
+                </Link>
                 <span className="text-xs text-muted-foreground">
                   {byStatus[status].length > 0 ? byStatus[status].length : null}
                 </span>
               </div>
             </div>
             <div className="flex flex-col gap-2 rounded-lg bg-muted/40 p-2 min-h-[120px]">
-              {byStatus[status].map((r) => (
+              {byStatus[status].slice(0, TOP_N_TICKETS).map((r) => (
                 <Link key={r.id} to="/admin/requests/$id" params={{ id: r.id }} className="block">
                   <Card className="p-3 hover:shadow-sm transition-shadow">
                     <div className="text-xs font-mono text-muted-foreground">
@@ -105,6 +111,13 @@ function AdminBoardPage() {
                   </Card>
                 </Link>
               ))}
+              {byStatus[status].length > TOP_N_TICKETS ? (
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/admin/$id" params={{ id: status }}>
+                    View all
+                  </Link>
+                </Button>
+              ) : null}
               {byStatus[status].length === 0 ? (
                 <div className="text-xs text-muted-foreground text-center py-6">
                   No {STATUS_LABELS[status].toLowerCase()} requests
