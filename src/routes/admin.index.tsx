@@ -72,7 +72,10 @@ function AdminBoardPage() {
           <div key={status} className="flex flex-col min-w-0">
             <div className="flex items-center justify-between mb-2 px-1">
               <div className="flex items-center gap-2">
-                <StatusBadge status={status} />
+                <Link to="/admin/$id" params={{ id: status }}>
+                  {" "}
+                  <StatusBadge status={status} />
+                </Link>
                 <span className="text-xs text-muted-foreground">
                   {byStatus[status].length > 0 ? byStatus[status].length : null}
                 </span>
