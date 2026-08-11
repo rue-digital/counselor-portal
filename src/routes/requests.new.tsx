@@ -21,6 +21,7 @@ import {
   ASSISTANCE_REASON_VALUES,
   TicketInsert,
 } from "@/lib/types";
+import { MultiSelect } from "@/components/ui/multiselect";
 import { createRequest } from "@/lib/tickets.server";
 
 export const Route = createFileRoute("/requests/new")({
@@ -36,6 +37,8 @@ function NewRequestPage() {
   const { profile } = Route.useRouteContext();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  const [assistanceTypes, setAssistanceTypes] = useState<string[]>([]);
+  const [assistanceReasons, setAssistanceReasons] = useState<string[]>([]);
 
   const handleSubmit = async (e: {
     preventDefault: () => void;
@@ -81,29 +84,23 @@ function NewRequestPage() {
         </CardHeader>
         <CardContent>
           <form className="space-y-5" onSubmit={handleSubmit}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="requested_item">What does the family need?</Label>
-                <Input
-                  id="requested_item"
-                  type="text"
-                  required
-                  placeholder="Example: Kroger gift card, electric bill payment, twin mattress, bicycle"
-                  name="requested_item"
-                />
-              </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="identifier">Family reference code</Label>
+                <Label htmlFor="identifier" required={true}>
+                  Family reference code
+                </Label>
                 <Input
                   id="identifier"
                   type="text"
                   name="family_reference_code"
                   required
-                  placeholder="e.g. A. Nguyen"
+                  placeholder="e.g. PYM-BHS"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="school_name">School</Label>
+                <Label htmlFor="school_name" required={true}>
+                  School
+                </Label>
                 <Select defaultValue="Bexley High School" name="school_name">
                   <SelectTrigger id="school_name">
                     <SelectValue />
@@ -117,68 +114,48 @@ function NewRequestPage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="assistance_type" required={true}>
+                Type of Assistance Requested
+              </Label>
+              <MultiSelect
+                name={"assistance_type"}
+                options={ASSISTANCE_TYPE_VALUES.map((i) => ({ label: i, value: i }))}
+                value={assistanceTypes}
+                onValueChange={setAssistanceTypes}
+                placeholder="Select assistance types"
+              ></MultiSelect>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="request_details" required={true}>
+                Specific Details & Quantities
+              </Label>
+              <Textarea
+                id="request_details"
+                name="request_details"
+                required
+                rows={2}
+                placeholder="e.g., $150 Grocery Gift Card; Size 4T winter coat; Water bill pay-off ($400)"
+              />
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="type">Type of Assistance Requested</Label>
-                <Select defaultValue="Other" name="assistance_type">
-                  <SelectTrigger id="type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ASSISTANCE_TYPE_VALUES.map((u) => (
-                      <SelectItem key={u} value={u}>
-                        {u}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="reason">Primary Reason for Request</Label>
-                <Select defaultValue="Other" name="assistance_reason">
-                  <SelectTrigger id="reason">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ASSISTANCE_REASON_VALUES.map((u) => (
-                      <SelectItem key={u} value={u}>
-                        {u}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2 sm:col-span-2 mt-4">
-                <Label htmlFor="assistance_details">Reason for Assistance</Label>
-                <Textarea
-                  id="assistance_details"
-                  rows={2}
-                  name="assistance_details"
-                  placeholder="Describe the family's situation and explain why this assistance is needed. Include any circumstances that will help reviewers understand the request."
-                />
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="past_assistance">
-                  What support has this family received from DARN in the past 12 months?
+                <Label htmlFor="assistance_reason" required={true}>
+                  Primary Reason for Request
                 </Label>
-                <Textarea
-                  id="past_assistance"
-                  rows={2}
-                  name="past_assistance"
-                  placeholder="If known, describe any assistance the family has received."
-                />
-              </div>
-              <div className="space-y-2 sm:col-span-2 mt-4">
-                <Label htmlFor="request_details">Describe what is needed</Label>
-                <Textarea
-                  id="request_details"
-                  name="request_details"
-                  required
-                  rows={6}
-                  placeholder="Include specifics such as amounts, sizes, gender identity, or any other details needed to fulfill this request."
-                />
+                <MultiSelect
+                  name={"assistance_reason"}
+                  options={ASSISTANCE_REASON_VALUES.map((i) => ({ label: i, value: i }))}
+                  value={assistanceReasons}
+                  onValueChange={setAssistanceReasons}
+                  placeholder="Select assistance reasons"
+                ></MultiSelect>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="priority">Urgency</Label>
+                <Label htmlFor="priority" required={true}>
+                  Urgency
+                </Label>
                 <Select defaultValue="Low" name="priority">
                   <SelectTrigger id="priority">
                     <SelectValue />
@@ -192,6 +169,28 @@ function NewRequestPage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="assistance_details" required={true}>
+                Context & Family Background
+              </Label>
+              <Textarea
+                id="assistance_details"
+                rows={2}
+                name="assistance_details"
+                placeholder="Describe the family's situation and explain why this assistance is needed. Include any circumstances that will help reviewers understand the request."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="past_assistance">
+                What support has this family received from DARN in the past 12 months?
+              </Label>
+              <Textarea
+                id="past_assistance"
+                rows={2}
+                name="past_assistance"
+                placeholder="If known, describe any assistance the family has received."
+              />
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => navigate({ to: "/requests" })}>
