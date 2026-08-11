@@ -20,7 +20,7 @@ export const Route = createFileRoute("/admin/$id")({
     const profile = await requireRole("admin");
     return { profile };
   },
-  head: () => ({ meta: [{ title: "Request — Admin" }] }),
+  head: () => ({ meta: [{ title: "Requests — Admin" }] }),
   component: CategoryPage,
   notFoundComponent: () => (
     <PortalShell role="admin" title="Requests not found">
