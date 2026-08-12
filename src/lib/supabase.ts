@@ -217,9 +217,9 @@ export type Database = {
       };
       darn_portal_tickets: {
         Row: {
-          assistance_details: string | null;
-          assistance_reason: Database["public"]["Enums"]["darn_ticket_assistance_reason"];
-          assistance_type: Database["public"]["Enums"]["darn_ticket_assistance_type"];
+          assistance_context: string;
+          assistance_reasons: Database["public"]["Enums"]["darn_ticket_assistance_reason"][];
+          assistance_types: Database["public"]["Enums"]["darn_ticket_assistance_type"][];
           created_at: string;
           created_by_profile_id: string;
           family_reference_code: string | null;
@@ -228,15 +228,14 @@ export type Database = {
           past_assistance: string | null;
           priority: Database["public"]["Enums"]["darn_ticket_priority"];
           request_details: string;
-          requested_item: string;
           school_name: Database["public"]["Enums"]["school"];
           status: Database["public"]["Enums"]["darn_ticket_status"];
           updated_at: string;
         };
         Insert: {
-          assistance_details?: string | null;
-          assistance_reason?: Database["public"]["Enums"]["darn_ticket_assistance_reason"];
-          assistance_type?: Database["public"]["Enums"]["darn_ticket_assistance_type"];
+          assistance_context: string;
+          assistance_reasons?: Database["public"]["Enums"]["darn_ticket_assistance_reason"][];
+          assistance_types?: Database["public"]["Enums"]["darn_ticket_assistance_type"][];
           created_at?: string;
           created_by_profile_id: string;
           family_reference_code?: string | null;
@@ -245,15 +244,14 @@ export type Database = {
           past_assistance?: string | null;
           priority?: Database["public"]["Enums"]["darn_ticket_priority"];
           request_details: string;
-          requested_item: string;
           school_name?: Database["public"]["Enums"]["school"];
           status: Database["public"]["Enums"]["darn_ticket_status"];
           updated_at?: string;
         };
         Update: {
-          assistance_details?: string | null;
-          assistance_reason?: Database["public"]["Enums"]["darn_ticket_assistance_reason"];
-          assistance_type?: Database["public"]["Enums"]["darn_ticket_assistance_type"];
+          assistance_context?: string;
+          assistance_reasons?: Database["public"]["Enums"]["darn_ticket_assistance_reason"][];
+          assistance_types?: Database["public"]["Enums"]["darn_ticket_assistance_type"][];
           created_at?: string;
           created_by_profile_id?: string;
           family_reference_code?: string | null;
@@ -262,7 +260,6 @@ export type Database = {
           past_assistance?: string | null;
           priority?: Database["public"]["Enums"]["darn_ticket_priority"];
           request_details?: string;
-          requested_item?: string;
           school_name?: Database["public"]["Enums"]["school"];
           status?: Database["public"]["Enums"]["darn_ticket_status"];
           updated_at?: string;
