@@ -132,6 +132,12 @@ function NewRequestPage() {
                 placeholder="Select assistance types"
               ></MultiSelect>
             </div>
+            {assistanceTypes.includes("Gift Card") || assistanceTypes.includes("Utility Bill") ? (
+              <p className="text-sm italic">
+                For utility bills or gift cards, Denny Devine (614-403-0232) will contact you for
+                more details.
+              </p>
+            ) : null}
             <div className="space-y-2">
               <Label htmlFor="request_details" required={true}>
                 Specific details & quantities
