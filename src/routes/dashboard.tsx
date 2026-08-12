@@ -104,9 +104,13 @@ function DashboardPage() {
               className="flex items-center justify-between py-3 hover:bg-muted/40 -mx-6 px-6"
             >
               <div className="min-w-0">
-                <div className="font-medium truncate">{r.requested_item}</div>
+                <div className="font-medium truncate">
+                  {r.request_details.length > 120
+                    ? r.request_details.slice(0, 120) + "..."
+                    : r.request_details}
+                </div>
                 <div className="text-xs text-muted-foreground">
-                  {"REQ-" + r.id.slice(0, 8)} · {r.assistance_type} · Updated{" "}
+                  {"REQ-" + r.id.slice(0, 8)} · {r.assistance_types} · Updated{" "}
                   {formatDate(r.updated_at)}
                 </div>
               </div>

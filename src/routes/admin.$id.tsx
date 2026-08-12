@@ -58,8 +58,7 @@ function CategoryPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Title</TableHead>
+              <TableHead>Request Info</TableHead>
               <TableHead>Counselor</TableHead>
               <TableHead>Family Code</TableHead>
               <TableHead>Category</TableHead>
@@ -71,14 +70,11 @@ function CategoryPage() {
           <TableBody>
             {tickets?.map((r) => (
               <TableRow key={r.id} className="cursor-pointer" id={r.id}>
-                <TableCell className="font-mono text-xs">
-                  <Link to="/admin/requests/$id" params={{ id: r.id }} className="block w-full">
-                    {"REQ-" + r.id.slice(0, 8)}
-                  </Link>
-                </TableCell>
                 <TableCell className="font-medium">
                   <Link to="/admin/requests/$id" params={{ id: r.id }} className="block w-full">
-                    {r.requested_item}
+                    {r.request_details.length > 45
+                      ? r.request_details.slice(0, 45) + "..."
+                      : r.request_details}
                   </Link>
                 </TableCell>
                 <TableCell className="font-medium">
@@ -93,7 +89,7 @@ function CategoryPage() {
                 </TableCell>
                 <TableCell>
                   <Link to="/admin/requests/$id" params={{ id: r.id }} className="block w-full">
-                    {r.assistance_type}
+                    {r.assistance_types.join(", ")}
                   </Link>
                 </TableCell>
                 <TableCell>

@@ -63,21 +63,32 @@ export function RequestDetail({ role, request }: RequestDetailProps) {
                 <div className="text-xs text-muted-foreground font-mono">
                   {"REQ-" + request.id.slice(0, 8)}
                 </div>
-                <CardTitle className="mt-1">{request.requested_item}</CardTitle>
+                <CardTitle className="mt-1">
+                  {request.request_details.length > 80
+                    ? request.request_details.slice(0, 80) + "..."
+                    : request.request_details}
+                </CardTitle>
               </div>
               <StatusBadge status={currentStatus ?? "submitted"} />
             </div>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
-            <p className="text-foreground/90 whitespace-pre-line">{request.assistance_details}</p>
-            <p className="text-foreground/90 whitespace-pre-line">{request.request_details}</p>
+            <p className="text-foreground/90 whitespace-pre-line">
+              Primary reason for request: {request.assistance_reasons.join(", ")}
+            </p>
+            <p className="text-foreground/90 whitespace-pre-line">
+              Context & family background: {request.assistance_context}
+            </p>
             <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t">
-              <Field label="Category" value={request.assistance_type} />
+              <Field label="Category" value={request.assistance_types.join(", ")} />
               <Field label="Urgency" value={request.priority} />
               <Field label="Family Code" value={request.family_reference_code || ""} />
               <Field label="Counselor" value={request.counselor} />
               <Field label="Created" value={formatDate(request.created_at)} />
               <Field label="Updated" value={formatDate(request.updated_at)} />
+              {request.needed_by ? (
+                <Field label="Needed By" value={formatDate(request.needed_by)} />
+              ) : null}
             </dl>
           </CardContent>
         </Card>
