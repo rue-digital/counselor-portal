@@ -6,12 +6,16 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LifeBuoy } from "lucide-react";
 import { supabase } from "../supabaseClient";
-import { getLoggedInUserProfile, signIn } from "@/lib/auth";
+import { getLoggedInUserProfile, isPasswordRecovery, signIn } from "@/lib/auth";
 import { toast } from "sonner";
 import { redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
+    if (isPasswordRecovery()) {
+      throw redirect({ to: "/reset-password" });
+    }
+
     const profile = await getLoggedInUserProfile();
     if (profile) {
       throw redirect({ to: profile.role == "admin" ? "/admin" : "/dashboard" });
@@ -78,7 +82,15 @@ function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"

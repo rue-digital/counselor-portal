@@ -10,6 +10,7 @@ import {
   Users,
   LogOut,
   LifeBuoy,
+  Settings,
 } from "lucide-react";
 import { supabase } from "@/supabaseClient";
 
@@ -83,6 +84,18 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
           })}
         </nav>
         <div className="border-t p-3 space-y-1">
+          <Link
+            to="/settings"
+            className={cn(
+              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              pathname === "/settings"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+          >
+            <Settings className="h-4 w-4" />
+            Settings
+          </Link>
           <button
             className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground hover:cursor-pointer"
             onClick={() => {

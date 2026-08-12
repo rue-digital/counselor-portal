@@ -20,6 +20,52 @@ export async function signIn(email: string, password: string) {
 
 export async function signOut() {}
 
+const PASSWORD_RECOVERY_KEY = "passwordRecovery";
+
+export function isPasswordRecovery(): boolean {
+  if (typeof sessionStorage === "undefined") return false;
+  return sessionStorage.getItem(PASSWORD_RECOVERY_KEY) === "1";
+}
+
+export function setPasswordRecovery(active: boolean) {
+  if (typeof sessionStorage === "undefined") return;
+  if (active) sessionStorage.setItem(PASSWORD_RECOVERY_KEY, "1");
+  else sessionStorage.removeItem(PASSWORD_RECOVERY_KEY);
+}
+
+export async function requestPasswordReset(email: string) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
+  });
+  return error;
+}
+
+export async function updatePassword(password: string) {
+  const { error } = await supabase.auth.updateUser({ password });
+  return error;
+}
+
+export async function changePassword(currentPassword: string, newPassword: string) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return new Error("You must be signed in to change your password.");
+  }
+
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: currentPassword,
+  });
+
+  if (signInError) {
+    return new Error("Current password is incorrect.");
+  }
+
+  return updatePassword(newPassword);
+}
+
 export async function getAllUsers() {
   const {
     data: { user },

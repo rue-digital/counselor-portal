@@ -1,7 +1,11 @@
 import { redirect } from "@tanstack/react-router";
-import { getLoggedInUserProfile, type Profile } from "./auth";
+import { getLoggedInUserProfile, isPasswordRecovery, type Profile } from "./auth";
 
 export async function requireAuth(): Promise<Profile> {
+  if (isPasswordRecovery()) {
+    throw redirect({ to: "/reset-password" });
+  }
+
   const profile = await getLoggedInUserProfile();
   if (!profile) throw redirect({ to: "/login" });
   return profile;
