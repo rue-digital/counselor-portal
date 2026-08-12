@@ -55,16 +55,16 @@ function NewRequestPage() {
     try {
       const formData = new FormData(e.currentTarget);
       const ticketData = {
-        requested_item: String(formData.get("requested_item")),
         family_reference_code: String(formData.get("family_reference_code")),
         school_name: formData.get("school_name") as TicketInsert["school_name"],
-        assistance_type: formData.get("assistance_type") as TicketInsert["assistance_type"],
-        assistance_reason: formData.get("assistance_reason") as TicketInsert["assistance_reason"],
-        assistance_details: String(formData.get("assistance_details")),
+        assistance_types: assistanceTypes as TicketInsert["assistance_types"],
+        assistance_reasons: assistanceReasons as TicketInsert["assistance_reasons"],
+        assistance_context: String(formData.get("assistance_context")),
         past_assistance: String(formData.get("past_assistance")),
         request_details: String(formData.get("request_details")),
         priority: formData.get("priority") as TicketInsert["priority"],
         status: "submitted" as TicketInsert["status"],
+        needed_by: date as TicketInsert["needed_by"],
       };
       await createRequest({ data: ticketData });
 
@@ -121,11 +121,11 @@ function NewRequestPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="assistance_type" required={true}>
+              <Label htmlFor="assistance_types" required={true}>
                 Type of assistance requested
               </Label>
               <MultiSelect
-                name={"assistance_type"}
+                name={"assistance_types"}
                 options={ASSISTANCE_TYPE_VALUES.map((i) => ({ label: i, value: i }))}
                 value={assistanceTypes}
                 onValueChange={setAssistanceTypes}
@@ -146,11 +146,11 @@ function NewRequestPage() {
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="assistance_reason" required={true}>
+                <Label htmlFor="assistance_reasons" required={true}>
                   Primary reason for request
                 </Label>
                 <MultiSelect
-                  name={"assistance_reason"}
+                  name={"assistance_reasons"}
                   options={ASSISTANCE_REASON_VALUES.map((i) => ({ label: i, value: i }))}
                   value={assistanceReasons}
                   onValueChange={setAssistanceReasons}
@@ -176,13 +176,14 @@ function NewRequestPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="assistance_details" required={true}>
+              <Label htmlFor="assistance_context" required={true}>
                 Context & family background
               </Label>
               <Textarea
-                id="assistance_details"
+                id="assistance_context"
                 rows={2}
-                name="assistance_details"
+                name="assistance_context"
+                required
                 placeholder="Describe the family's situation and explain why this assistance is needed. Include any circumstances that will help reviewers understand the request."
               />
             </div>

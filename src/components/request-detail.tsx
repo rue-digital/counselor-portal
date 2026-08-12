@@ -69,11 +69,14 @@ export function RequestDetail({ role, request }: RequestDetailProps) {
             </div>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
-            <p className="text-foreground/90 whitespace-pre-line">{request.assistance_reasons}</p>
-            <p className="text-foreground/90 whitespace-pre-line">{request.assistance_context}</p>
-            <p className="text-foreground/90 whitespace-pre-line">{request.assistance_details}</p>
+            <p className="text-foreground/90 whitespace-pre-line">
+              Primary reason for request: {request.assistance_reasons.join(", ")}
+            </p>
+            <p className="text-foreground/90 whitespace-pre-line">
+              Context & family background: {request.assistance_context}
+            </p>
             <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t">
-              <Field label="Category" value={request.assistance_types} />
+              <Field label="Category" value={request.assistance_types.join(", ")} />
               <Field label="Urgency" value={request.priority} />
               <Field label="Family Code" value={request.family_reference_code || ""} />
               <Field label="Counselor" value={request.counselor} />
