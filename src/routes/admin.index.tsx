@@ -89,7 +89,9 @@ function AdminBoardPage() {
                       {"REQ-" + r.id.slice(0, 8)}
                     </div>
                     <div className="font-medium text-sm mt-0.5 line-clamp-2">
-                      {r.request_details}
+                      {r.request_details.length > 45
+                        ? r.request_details.slice(0, 45) + "..."
+                        : r.request_details}
                     </div>
                     <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
                       <span>{r.counselor}</span>

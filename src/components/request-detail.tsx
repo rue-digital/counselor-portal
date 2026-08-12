@@ -63,7 +63,11 @@ export function RequestDetail({ role, request }: RequestDetailProps) {
                 <div className="text-xs text-muted-foreground font-mono">
                   {"REQ-" + request.id.slice(0, 8)}
                 </div>
-                <CardTitle className="mt-1">{request.request_details}</CardTitle>
+                <CardTitle className="mt-1">
+                  {request.request_details.length > 80
+                    ? request.request_details.slice(0, 80) + "..."
+                    : request.request_details}
+                </CardTitle>
               </div>
               <StatusBadge status={currentStatus ?? "submitted"} />
             </div>

@@ -72,7 +72,9 @@ function CategoryPage() {
               <TableRow key={r.id} className="cursor-pointer" id={r.id}>
                 <TableCell className="font-medium">
                   <Link to="/admin/requests/$id" params={{ id: r.id }} className="block w-full">
-                    {r.request_details}
+                    {r.request_details.length > 45
+                      ? r.request_details.slice(0, 45) + "..."
+                      : r.request_details}
                   </Link>
                 </TableCell>
                 <TableCell className="font-medium">
@@ -87,7 +89,7 @@ function CategoryPage() {
                 </TableCell>
                 <TableCell>
                   <Link to="/admin/requests/$id" params={{ id: r.id }} className="block w-full">
-                    {r.assistance_types}
+                    {r.assistance_types.join(", ")}
                   </Link>
                 </TableCell>
                 <TableCell>

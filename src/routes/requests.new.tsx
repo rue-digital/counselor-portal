@@ -142,11 +142,11 @@ function NewRequestPage() {
               <Label htmlFor="request_details" required={true}>
                 Specific details & quantities
               </Label>
-              <Textarea
+              <Input
                 id="request_details"
+                type="text"
                 name="request_details"
                 required
-                rows={2}
                 placeholder="e.g., $150 Grocery Gift Card; Size 4T winter coat; Water bill pay-off ($400)"
               />
             </div>
