@@ -23,6 +23,10 @@ import {
 } from "@/lib/types";
 import { MultiSelect } from "@/components/ui/multiselect";
 import { createRequest } from "@/lib/tickets.server";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverTrigger } from "@/components/ui/popover";
+import { PopoverContent } from "@radix-ui/react-popover";
+import { CalendarIcon, CircleX } from "lucide-react";
 
 export const Route = createFileRoute("/requests/new")({
   beforeLoad: async () => {
@@ -39,6 +43,7 @@ function NewRequestPage() {
   const [submitting, setSubmitting] = useState(false);
   const [assistanceTypes, setAssistanceTypes] = useState<string[]>([]);
   const [assistanceReasons, setAssistanceReasons] = useState<string[]>([]);
+  const [date, setDate] = useState<Date | undefined>();
 
   const handleSubmit = async (e: {
     preventDefault: () => void;
@@ -117,7 +122,7 @@ function NewRequestPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="assistance_type" required={true}>
-                Type of Assistance Requested
+                Type of assistance requested
               </Label>
               <MultiSelect
                 name={"assistance_type"}
@@ -129,7 +134,7 @@ function NewRequestPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="request_details" required={true}>
-                Specific Details & Quantities
+                Specific details & quantities
               </Label>
               <Textarea
                 id="request_details"
@@ -142,7 +147,7 @@ function NewRequestPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="assistance_reason" required={true}>
-                  Primary Reason for Request
+                  Primary reason for request
                 </Label>
                 <MultiSelect
                   name={"assistance_reason"}
@@ -172,7 +177,7 @@ function NewRequestPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="assistance_details" required={true}>
-                Context & Family Background
+                Context & family background
               </Label>
               <Textarea
                 id="assistance_details"
@@ -191,6 +196,31 @@ function NewRequestPage() {
                 name="past_assistance"
                 placeholder="If known, describe any assistance the family has received."
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="needed_by">Needed by</Label>
+              <Popover>
+                <PopoverTrigger asChild className="ml-4">
+                  <Button variant="outline">
+                    <CalendarIcon className="mr-1 size-4" />
+                    {date ? date.toLocaleDateString() : "select date"}
+                    {date ? (
+                      <Button
+                        type="reset"
+                        onClick={() => setDate(undefined)}
+                        variant="ghost"
+                        className="p-0 m-0"
+                      >
+                        <CircleX className="text-gray-600" />
+                      </Button>
+                    ) : null}
+                  </Button>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={date} onSelect={setDate} />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => navigate({ to: "/requests" })}>
