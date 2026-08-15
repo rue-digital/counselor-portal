@@ -27,6 +27,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { CalendarIcon, CircleX } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/requests/new")({
   beforeLoad: async () => {
@@ -44,6 +45,7 @@ function NewRequestPage() {
   const [assistanceTypes, setAssistanceTypes] = useState<string[]>([]);
   const [assistanceReasons, setAssistanceReasons] = useState<string[]>([]);
   const [date, setDate] = useState<Date | undefined>();
+  const [isUrgent, setIsUrgent] = useState(false);
 
   const handleSubmit = async (e: {
     preventDefault: () => void;
@@ -56,15 +58,17 @@ function NewRequestPage() {
       const formData = new FormData(e.currentTarget);
       const ticketData = {
         family_reference_code: String(formData.get("family_reference_code")),
+        youth_in_family: Number(formData.get("youth_in_family")),
         school_name: formData.get("school_name") as TicketInsert["school_name"],
         assistance_types: assistanceTypes as TicketInsert["assistance_types"],
         assistance_reasons: assistanceReasons as TicketInsert["assistance_reasons"],
         assistance_context: String(formData.get("assistance_context")),
         past_assistance: String(formData.get("past_assistance")),
         request_details: String(formData.get("request_details")),
-        priority: formData.get("priority") as TicketInsert["priority"],
+        priority: (isUrgent ? "Urgent" : "Low") as TicketInsert["priority"], //TESTESTEESTTEST
         status: "submitted" as TicketInsert["status"],
         needed_by: date as TicketInsert["needed_by"],
+        
       };
       await createRequest({ data: ticketData });
 
@@ -99,7 +103,21 @@ function NewRequestPage() {
                   type="text"
                   name="family_reference_code"
                   required
-                  placeholder="e.g. PYM-BHS"
+                  placeholder=" family code - initials - school e.g. EVE-MS-MT"
+                  pattern="^[A-Za-z]{3}-[A-Za-z]{2}-[A-Za-z]{2}$"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="youth_in_family" required={true}>
+                  Youth in family
+                </Label>
+                <Input
+                  id="youth_in_family"
+                  type="number"
+                  name="youth_in_family"
+                  min={0}
+                  required
+                  placeholder="0"
                 />
               </div>
               <div className="space-y-2">
@@ -164,22 +182,23 @@ function NewRequestPage() {
                 ></MultiSelect>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="priority" required={true}>
-                  Urgency
-                </Label>
-                <Select defaultValue="Low" name="priority">
-                  <SelectTrigger id="priority">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {["Low", "Medium", "High", "Urgent"].map((u) => (
-                      <SelectItem key={u} value={u}>
-                        {u}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <Label>Urgency</Label>
+              <div className="flex items-start space-x-3 rounded-md border p-3">
+                <Checkbox
+                  id="urgency"
+                  checked={isUrgent}
+                  onCheckedChange={(checked) => setIsUrgent(Boolean(checked))}
+                />
+                <div className="space-y-1 leading-none">
+                  <Label htmlFor="urgency" className="cursor-pointer font-medium">
+                    Mark as urgent request
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Immediate need such as utility shut-off, safety concern, or emergency accommodation.
+                  </p>
+                </div>
               </div>
+            </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="assistance_context" required={true}>
