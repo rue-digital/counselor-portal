@@ -7,6 +7,8 @@ import { getAllRequests } from "@/lib/tickets.server";
 import type { Request } from "@/lib/types";
 import { requireRole } from "@/lib/route-auth";
 import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react"; // or icon of choice
+import { exportTicketsToCSV } from "@/lib/export-csv";
 
 export const Route = createFileRoute("/admin/")({
   beforeLoad: async () => {
@@ -67,6 +69,18 @@ function AdminBoardPage() {
       title={`Welcome back, ${profile.full_name.split(" ")[0]}`}
       subtitle="All counselor requests, organized by status."
     >
+      {/* Export Action Bar */}
+      <div className="flex justify-end mb-4">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={!tickets || tickets.length === 0}
+          onClick={() => exportTicketsToCSV(tickets || [])}
+        >
+          <Download className="mr-2 h-4 w-4" />
+          Export CSV
+        </Button>
+      </div>
       <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(260px,1fr))]">
         {STATUSES.map((status) => (
           <div key={status} className="flex flex-col min-w-0">
