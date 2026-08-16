@@ -54,47 +54,97 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4 py-12">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <LifeBuoy className="h-5 w-5" />
-          </div>
-          <div>
-            <CardTitle>Sign in to your account</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" method="POST" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+    <div className="min-h-screen flex flex-col bg-[#F4F9FE]">
+      <header className="w-full bg-white border-b border-border/40 py-6 px-8 min-h-[72px] shadow-xs">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Top banner content placeholder */}
+        {/* Left: DARN Logo & Subtitle */}
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1E3B70]/10 text-[#1E3B70]">
+              <LifeBuoy className="h-6 w-6" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+            <div className="flex flex-col">
+              <span className="font-bold text-lg text-[#1E3B70] leading-tight tracking-tight">
+                DARN
+              </span>
+              <span className="text-[11px] text-muted-foreground leading-none">
+                Bexley, Ohio
+              </span>
             </div>
-            <Button type="submit" className="w-full">
-              Continue
-            </Button>
-            <p className="text-center text-xs text-muted-foreground pt-2">
-              No sign up — accounts are created by an administrator.
-            </p>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+
+          {/* Right: Navigation Links */}
+          <nav className="flex items-center gap-6 text-sm font-medium text-muted-foreground">
+            <a href="#" className="hover:text-foreground transition-colors">
+              Home
+            </a>
+            <a href="#" className="hover:text-foreground transition-colors">
+              About
+            </a>
+            <a href="#" className="hover:text-foreground transition-colors">
+              Contact
+            </a>
+            <a href="#" className="hover:text-foreground transition-colors">
+              Resources
+            </a>
+          </nav>
+        </div>
+      </header>
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        <Card className="w-full max-w-lg p-2 shadow-sm">
+          <CardHeader className="space-y-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#1E3B70] text-white">
+              <LifeBuoy className="h-5 w-5" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl font-bold tracking-tight text-[#1e293b]">
+                Sign In to Your Account
+              </CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4" method="POST" onSubmit={handleSubmit}>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your school email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button 
+                type="submit" 
+                className="w-full bg-[#1E3B70] hover:bg-[#152A52] text-white font-medium py-2.5 rounded-md transition-colors"
+              >
+                Login
+              </Button>
+              <p className="text-center text-xs text-muted-foreground pt-2">
+                No sign up — accounts are created by an administrator.
+              </p>
+            </form>
+          </CardContent>
+        </Card>
+      </main>
+
+      <footer className="w-full bg-[#1E3B70] text-white py-4 px-8 border-t border-[#152A52]">
+        <div className="max-w-7xl mx-auto text-center text-xs text-white/80">
+          DARN Counselor Portal
+        </div>
+      </footer>
     </div>
   );
 }
