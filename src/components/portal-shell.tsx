@@ -87,8 +87,8 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
             className={cn(
               "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
               pathname === "/settings"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                ? "bg-white text-[#1E3B70] [&>svg]:text-[#1E3B70]"
+                : "text-white/80 [&>svg]:text-white hover:bg-white/10 hover:text-white",
             )}
           >
             <Settings className="h-4 w-4" />
