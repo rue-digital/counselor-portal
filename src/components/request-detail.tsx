@@ -81,7 +81,7 @@ export function RequestDetail({ role, request }: RequestDetailProps) {
             </p>
             <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t">
               <Field label="Category" value={request.assistance_types.join(", ")} />
-              <Field label="Urgency" value={request.priority} />
+              <Field label="Urgent" value={String(request.urgent_need).toLocaleUpperCase()} />
               <Field label="Family Code" value={request.family_reference_code || ""} />
               <Field label="Counselor" value={request.counselor} />
               <Field label="Created" value={formatDate(request.created_at)} />
