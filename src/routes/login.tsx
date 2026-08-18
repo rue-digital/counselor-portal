@@ -8,6 +8,8 @@ import { LifeBuoy } from "lucide-react";
 import { getLoggedInUserProfile, signIn } from "@/lib/auth.server";
 import { toast } from "sonner";
 import { redirect } from "@tanstack/react-router";
+import darnLogo from "@/components/ui/darn-logo.jpg";
+import login from "@/components/ui/login.svg";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
@@ -60,9 +62,11 @@ function LoginPage() {
           {/* Top banner content placeholder */}
         {/* Left: DARN Logo & Subtitle */}
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1E3B70]/10 text-[#1E3B70]">
-              <LifeBuoy className="h-6 w-6" />
-            </div>
+            <img 
+              src={darnLogo} 
+              alt="" 
+              className="h-10 w-10 object-contain rounded-full" 
+            />
             <div className="flex flex-col">
               <span className="font-bold text-lg text-[#1E3B70] leading-tight tracking-tight">
                 DARN
@@ -93,9 +97,11 @@ function LoginPage() {
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <Card className="w-full max-w-lg p-2 shadow-sm">
           <CardHeader className="space-y-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#1E3B70] text-white">
-              <LifeBuoy className="h-5 w-5" />
-            </div>
+            <img 
+              src={login} 
+              alt="" 
+              className="h-10 w-10 object-contain" 
+            />
             <div>
               <CardTitle className="text-2xl font-bold tracking-tight text-[#1e293b]">
                 Sign In to Your Account

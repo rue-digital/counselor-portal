@@ -56,7 +56,7 @@ function DashboardPage() {
       title={`Welcome back, ${profile.full_name.split(" ")[0]}`}
       subtitle="Here's an overview of your active assistance requests."
       actions={
-        <Button asChild>
+        <Button asChild className="bg-[#1E3B70] hover:bg-[#152A52] text-white">
           <Link to="/requests/new">
             <FilePlus2 className="h-4 w-4" />
             New request
@@ -82,12 +82,6 @@ function DashboardPage() {
       <Card className="mt-6">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base">Recent activity</CardTitle>
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/requests">
-              View all
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
           <Button asChild variant="ghost" size="sm">
             <Link to="/requests">
               View all
