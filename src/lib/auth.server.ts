@@ -75,3 +75,57 @@ export const getLoggedInUserName = createServerFn({
   if (error) return;
   return data.full_name;
 });
+
+const requestPasswordResetSchema = z.object({
+  email: z.string().email(),
+  redirectTo: z.string().url(),
+});
+
+export const requestPasswordReset = createServerFn({ method: "POST" })
+  .validator(requestPasswordResetSchema)
+  .handler(async ({ data }) => {
+    const { createClient } = await import("./supabase/supabase.server");
+    const supabase = createClient();
+
+    const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+      redirectTo: data.redirectTo,
+    });
+
+    if (error) throw new Error(error.message);
+    return { success: true };
+  });
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(8),
+});
+
+export const changePassword = createServerFn({ method: "POST" })
+  .validator(changePasswordSchema)
+  .handler(async ({ data }) => {
+    const { createClient } = await import("./supabase/supabase.server");
+    const supabase = createClient();
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user?.email) {
+      throw new Error("You must be signed in to change your password.");
+    }
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: data.currentPassword,
+    });
+
+    if (signInError) {
+      throw new Error("Current password is incorrect.");
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: data.newPassword });
+    if (error) throw new Error(error.message);
+
+    return { success: true };
+  });
