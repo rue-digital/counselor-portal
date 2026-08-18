@@ -73,16 +73,22 @@ function LoginPage() {
 
           {/* Right: Navigation Links */}
           <nav className="flex items-center gap-6 text-sm font-medium text-muted-foreground">
-            <a href="#" className="hover:text-foreground transition-colors">
+            <a href="https://bexleydarn.org/" className="hover:text-foreground transition-colors">
               Home
             </a>
-            <a href="#" className="hover:text-foreground transition-colors">
+            <a
+              href="https://bexleydarn.org/about"
+              className="hover:text-foreground transition-colors"
+            >
               About
             </a>
-            <a href="#" className="hover:text-foreground transition-colors">
+            <a
+              href="https://bexleydarn.org/contact/"
+              className="hover:text-foreground transition-colors"
+            >
               Contact
             </a>
-            <a href="#" className="hover:text-foreground transition-colors">
+            <a href="https://bexleydarn.org/" className="hover:text-foreground transition-colors">
               Resources
             </a>
           </nav>
