@@ -226,11 +226,12 @@ export type Database = {
           id: string;
           needed_by: string | null;
           past_assistance: string | null;
-          priority: Database["public"]["Enums"]["darn_ticket_priority"];
           request_details: string;
           school_name: Database["public"]["Enums"]["school"];
           status: Database["public"]["Enums"]["darn_ticket_status"];
           updated_at: string;
+          urgent_need: boolean;
+          youth_in_family: number;
         };
         Insert: {
           assistance_context: string;
@@ -242,11 +243,12 @@ export type Database = {
           id?: string;
           needed_by?: string | null;
           past_assistance?: string | null;
-          priority?: Database["public"]["Enums"]["darn_ticket_priority"];
           request_details: string;
           school_name?: Database["public"]["Enums"]["school"];
           status: Database["public"]["Enums"]["darn_ticket_status"];
           updated_at?: string;
+          urgent_need?: boolean;
+          youth_in_family?: number;
         };
         Update: {
           assistance_context?: string;
@@ -258,11 +260,12 @@ export type Database = {
           id?: string;
           needed_by?: string | null;
           past_assistance?: string | null;
-          priority?: Database["public"]["Enums"]["darn_ticket_priority"];
           request_details?: string;
           school_name?: Database["public"]["Enums"]["school"];
           status?: Database["public"]["Enums"]["darn_ticket_status"];
           updated_at?: string;
+          urgent_need?: boolean;
+          youth_in_family?: number;
         };
         Relationships: [
           {

@@ -72,14 +72,17 @@ function MyRequestsPage() {
               <TableHead>Request Info</TableHead>
               <TableHead>Family Code</TableHead>
               <TableHead>Category</TableHead>
-              <TableHead>Urgency</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Updated</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {tickets?.map((r) => (
-              <TableRow key={r.id} className="cursor-pointer" id={r.id}>
+              <TableRow
+                key={r.id}
+                id={r.id}
+                className={`cursor-pointer ${r.urgent_need ? "bg-red-50 hover:bg-red-100" : ""}`}
+              >
                 <TableCell className="font-medium">
                   <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
                     {r.request_details.length > 45
@@ -95,11 +98,6 @@ function MyRequestsPage() {
                 <TableCell>
                   <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
                     {r.assistance_types.join(", ")}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Link to="/requests/$id" params={{ id: r.id }} className="block w-full">
-                    {r.priority}
                   </Link>
                 </TableCell>
                 <TableCell>

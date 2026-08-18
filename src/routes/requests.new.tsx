@@ -27,6 +27,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { CalendarIcon, CircleX } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/requests/new")({
   beforeLoad: async () => {
@@ -44,6 +45,7 @@ function NewRequestPage() {
   const [assistanceTypes, setAssistanceTypes] = useState<string[]>([]);
   const [assistanceReasons, setAssistanceReasons] = useState<string[]>([]);
   const [date, setDate] = useState<Date | undefined>();
+  const [isUrgent, setIsUrgent] = useState(false);
 
   const handleSubmit = async (e: {
     preventDefault: () => void;
@@ -56,15 +58,16 @@ function NewRequestPage() {
       const formData = new FormData(e.currentTarget);
       const ticketData = {
         family_reference_code: String(formData.get("family_reference_code")),
+        youth_in_family: Number(formData.get("youth_in_family")),
         school_name: formData.get("school_name") as TicketInsert["school_name"],
         assistance_types: assistanceTypes as TicketInsert["assistance_types"],
         assistance_reasons: assistanceReasons as TicketInsert["assistance_reasons"],
         assistance_context: String(formData.get("assistance_context")),
         past_assistance: String(formData.get("past_assistance")),
         request_details: String(formData.get("request_details")),
-        priority: formData.get("priority") as TicketInsert["priority"],
         status: "submitted" as TicketInsert["status"],
         needed_by: date as TicketInsert["needed_by"],
+        urgent_need: isUrgent as TicketInsert["urgent_need"],
       };
       await createRequest({ data: ticketData });
 
@@ -89,7 +92,7 @@ function NewRequestPage() {
         </CardHeader>
         <CardContent>
           <form className="space-y-5" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="identifier" required={true}>
                   Family reference code
@@ -99,7 +102,21 @@ function NewRequestPage() {
                   type="text"
                   name="family_reference_code"
                   required
-                  placeholder="e.g. PYM-BHS"
+                  placeholder="e.g. EVE-MS-MT"
+                  pattern="^[A-Za-z]{3}-[A-Za-z]{2}-[A-Za-z]{2}$"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="youth_in_family" required={true}>
+                  Youth in family
+                </Label>
+                <Input
+                  id="youth_in_family"
+                  type="number"
+                  name="youth_in_family"
+                  min={0}
+                  required
+                  placeholder="0"
                 />
               </div>
               <div className="space-y-2">
@@ -120,17 +137,31 @@ function NewRequestPage() {
                 </Select>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="assistance_types" required={true}>
-                Type of assistance requested
-              </Label>
-              <MultiSelect
-                name={"assistance_types"}
-                options={ASSISTANCE_TYPE_VALUES.map((i) => ({ label: i, value: i }))}
-                value={assistanceTypes}
-                onValueChange={setAssistanceTypes}
-                placeholder="Select assistance types"
-              ></MultiSelect>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="assistance_types" required={true}>
+                  Type of assistance requested
+                </Label>
+                <MultiSelect
+                  name={"assistance_types"}
+                  options={ASSISTANCE_TYPE_VALUES.map((i) => ({ label: i, value: i }))}
+                  value={assistanceTypes}
+                  onValueChange={setAssistanceTypes}
+                  placeholder="Select assistance types"
+                ></MultiSelect>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="assistance_reasons" required={true}>
+                  Primary reason for request
+                </Label>
+                <MultiSelect
+                  name={"assistance_reasons"}
+                  options={ASSISTANCE_REASON_VALUES.map((i) => ({ label: i, value: i }))}
+                  value={assistanceReasons}
+                  onValueChange={setAssistanceReasons}
+                  placeholder="Select assistance reasons"
+                ></MultiSelect>
+              </div>
             </div>
             {assistanceTypes.includes("Gift Card") || assistanceTypes.includes("Utility Bill") ? (
               <p className="text-sm italic">
@@ -149,37 +180,6 @@ function NewRequestPage() {
                 required
                 placeholder="e.g., $150 Grocery Gift Card; Size 4T winter coat; Water bill pay-off ($400)"
               />
-            </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="assistance_reasons" required={true}>
-                  Primary reason for request
-                </Label>
-                <MultiSelect
-                  name={"assistance_reasons"}
-                  options={ASSISTANCE_REASON_VALUES.map((i) => ({ label: i, value: i }))}
-                  value={assistanceReasons}
-                  onValueChange={setAssistanceReasons}
-                  placeholder="Select assistance reasons"
-                ></MultiSelect>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="priority" required={true}>
-                  Urgency
-                </Label>
-                <Select defaultValue="Low" name="priority">
-                  <SelectTrigger id="priority">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {["Low", "Medium", "High", "Urgent"].map((u) => (
-                      <SelectItem key={u} value={u}>
-                        {u}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="assistance_context" required={true}>
@@ -204,30 +204,52 @@ function NewRequestPage() {
                 placeholder="If known, describe any assistance the family has received."
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="needed_by">Needed by</Label>
-              <Popover>
-                <PopoverTrigger asChild className="ml-4">
-                  <Button variant="outline">
-                    <CalendarIcon className="mr-1 size-4" />
-                    {date ? date.toLocaleDateString() : "select date"}
-                    {date ? (
-                      <Button
-                        type="reset"
-                        onClick={() => setDate(undefined)}
-                        variant="ghost"
-                        className="p-0 m-0"
-                      >
-                        <CircleX className="text-gray-600" />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-[3fr_7fr]">
+              <div className="space-y-2">
+                <div className="flex flex-col">
+                  <Label htmlFor="needed_by" className="mb-1 mt-2">
+                    Needed by
+                  </Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full justify-start">
+                        <CalendarIcon className="mr-1 size-4" />
+                        {date ? date.toLocaleDateString() : "select date"}
+                        {date ? (
+                          <Button
+                            type="reset"
+                            onClick={() => setDate(undefined)}
+                            variant="ghost"
+                            className="p-0 m-0"
+                          >
+                            <CircleX className="text-gray-600" />
+                          </Button>
+                        ) : null}
                       </Button>
-                    ) : null}
-                  </Button>
-                </PopoverTrigger>
+                    </PopoverTrigger>
 
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={date} onSelect={setDate} />
-                </PopoverContent>
-              </Popover>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={date} onSelect={setDate} />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Mark as urgent, immediate need</Label>
+                <div className="flex items-center gap-3 rounded-md border p-2.5">
+                  <Checkbox
+                    id="urgent_need"
+                    checked={isUrgent}
+                    onCheckedChange={(checked) => setIsUrgent(Boolean(checked))}
+                  />
+                  <Label
+                    htmlFor="urgent_need"
+                    className="space-y-1 leading-none cursor-pointer font-normal"
+                  >
+                    e.g. utility shut-off, safety concern, or emergency accommodation
+                  </Label>
+                </div>
+              </div>
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => navigate({ to: "/requests" })}>

@@ -101,7 +101,7 @@ function DashboardPage() {
               key={r.id}
               to="/requests/$id"
               params={{ id: r.id }}
-              className="flex items-center justify-between py-3 hover:bg-muted/40 -mx-6 px-6"
+              className={`flex items-center justify-between py-3 hover:bg-muted/40 -mx-6 px-6 ${r.urgent_need ? "bg-red-50 hover:bg-red-100" : ""}`}
             >
               <div className="min-w-0">
                 <div className="font-medium truncate">
