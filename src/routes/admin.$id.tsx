@@ -52,7 +52,7 @@ function CategoryPage() {
     <PortalShell
       role={profile.role}
       title={`${STATUS_LABELS[id as RequestStatus]} Requests`}
-      subtitle={`Viewing all requests marked as ${STATUS_LABELS[id as RequestStatus].toLowerCase()}.`}
+      subtitle={`Viewing all requests marked as ${STATUS_LABELS[id as RequestStatus].toLowerCase()}. Urgent requests are highlighted in red.`}
     >
       <Card className="p-4">
         <Table>
@@ -62,14 +62,17 @@ function CategoryPage() {
               <TableHead>Counselor</TableHead>
               <TableHead>Family Code</TableHead>
               <TableHead>Category</TableHead>
-              <TableHead>Urgency</TableHead>
               <TableHead>Updated</TableHead>
               <TableHead>Created</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {tickets?.map((r) => (
-              <TableRow key={r.id} className="cursor-pointer" id={r.id}>
+              <TableRow
+                key={r.id}
+                id={r.id}
+                className={`cursor-pointer ${r.urgent_need ? "bg-red-50 hover:bg-red-100" : ""}`}
+              >
                 <TableCell className="font-medium">
                   <Link to="/admin/requests/$id" params={{ id: r.id }} className="block w-full">
                     {r.request_details.length > 45
@@ -90,11 +93,6 @@ function CategoryPage() {
                 <TableCell>
                   <Link to="/admin/requests/$id" params={{ id: r.id }} className="block w-full">
                     {r.assistance_types.join(", ")}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Link to="/admin/requests/$id" params={{ id: r.id }} className="block w-full">
-                    {r.priority}
                   </Link>
                 </TableCell>
                 <TableCell className="text-muted-foreground">

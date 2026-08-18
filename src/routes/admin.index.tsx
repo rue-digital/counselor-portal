@@ -109,17 +109,9 @@ function AdminBoardPage() {
                     </div>
                     <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
                       <span>{r.counselor}</span>
-                      <span
-                        className={
-                          r.priority === "High"
-                            ? "text-rose-600 font-medium"
-                            : r.priority === "Medium"
-                              ? "text-amber-600"
-                              : ""
-                        }
-                      >
-                        {r.priority}
-                      </span>
+                      {r.urgent_need ? (
+                        <span className="text-rose-600 font-medium">urgent</span>
+                      ) : null}
                     </div>
                     <div className="mt-1 text-xs text-muted-foreground">
                       Updated {formatDate(r.updated_at)}
