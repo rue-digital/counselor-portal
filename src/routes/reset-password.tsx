@@ -19,6 +19,17 @@ export const Route = createFileRoute("/reset-password")({
   component: ResetPasswordPage,
 });
 
+function hasRecoveryMarkers() {
+  const params = new URLSearchParams(window.location.search);
+  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  return (
+    params.has("code") ||
+    params.get("type") === "recovery" ||
+    hash.get("type") === "recovery" ||
+    hash.has("access_token")
+  );
+}
+
 function ResetPasswordPage() {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
@@ -29,31 +40,87 @@ function ResetPasswordPage() {
 
   useEffect(() => {
     let active = true;
-    let sawRecovery = false;
+    let resolved = false;
     const supabase = createClient();
+
+    const markReady = () => {
+      if (!active || resolved) return;
+      resolved = true;
+      setPasswordRecovery(true);
+      setReady(true);
+      setInvalidLink(false);
+    };
+
+    const markInvalid = () => {
+      if (!active || resolved) return;
+      resolved = true;
+      setInvalidLink(true);
+      setReady(false);
+    };
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (!active) return;
 
+      // PKCE recovery often emits SIGNED_IN; older/implicit flows emit PASSWORD_RECOVERY.
       if (event === "PASSWORD_RECOVERY") {
-        sawRecovery = true;
-        setPasswordRecovery(true);
-        setReady(true);
-        setInvalidLink(false);
+        markReady();
+        return;
+      }
+
+      if (event === "SIGNED_IN" && session && hasRecoveryMarkers()) {
+        markReady();
       }
     });
 
-    const timeoutId = window.setTimeout(() => {
-      if (!active || sawRecovery) return;
-      setInvalidLink(true);
-      setReady(false);
-    }, 1500);
+    async function establishRecoverySession() {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
+
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (!active) return;
+        if (error) {
+          console.error("exchangeCodeForSession failed:", error);
+          markInvalid();
+          return;
+        }
+        markReady();
+        // Clean the auth code out of the URL without a navigation.
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!active) return;
+
+      if (session && hasRecoveryMarkers()) {
+        markReady();
+        return;
+      }
+
+      // Give onAuthStateChange a moment for hash-based implicit recovery tokens.
+      window.setTimeout(async () => {
+        if (!active || resolved) return;
+        const {
+          data: { session: laterSession },
+        } = await supabase.auth.getSession();
+        if (!active || resolved) return;
+        if (laterSession && hasRecoveryMarkers()) {
+          markReady();
+        } else {
+          markInvalid();
+        }
+      }, 2500);
+    }
+
+    void establishRecoverySession();
 
     return () => {
       active = false;
-      window.clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
   }, []);

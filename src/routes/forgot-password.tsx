@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LifeBuoy } from "lucide-react";
-import { getLoggedInUserProfile, requestPasswordReset } from "@/lib/auth.server";
+import { getLoggedInUserProfile } from "@/lib/auth.server";
 import { isPasswordRecovery } from "@/lib/password-recovery";
+import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { redirect } from "@tanstack/react-router";
 
@@ -40,12 +41,10 @@ function ForgotPasswordPage() {
     setSubmitting(true);
 
     try {
-      // Always show success to avoid revealing whether an account exists.
-      await requestPasswordReset({
-        data: {
-          email,
-          redirectTo: `${window.location.origin}/reset-password`,
-        },
+      // Use the browser client so the PKCE code verifier is stored in this browser.
+      const supabase = createClient();
+      await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
       });
     } catch {
       // Swallow errors in the UI to avoid account enumeration.
