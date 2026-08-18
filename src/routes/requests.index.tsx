@@ -57,7 +57,7 @@ function MyRequestsPage() {
       title="My Requests"
       subtitle="All assistance requests you've submitted."
       actions={
-        <Button asChild>
+        <Button asChild className="bg-[#1E3B70] hover:bg-[#152A52] text-white">
           <Link to="/requests/new">
             <FilePlus2 className="h-4 w-4" />
             New request

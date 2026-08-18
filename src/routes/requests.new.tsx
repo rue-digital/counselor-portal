@@ -255,7 +255,7 @@ function NewRequestPage() {
               <Button type="button" variant="outline" onClick={() => navigate({ to: "/requests" })}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={submitting}>
+              <Button type="submit" disabled={submitting} className="bg-[#1E3B70] hover:bg-[#152A52] text-white">
                 {submitting ? "Submitting..." : "Submit request"}
               </Button>
             </div>

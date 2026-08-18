@@ -113,7 +113,7 @@ function UsersPage() {
           }}
         >
           <DialogTrigger asChild>
-            <Button>
+            <Button className="bg-[#1E3B70] hover:bg-[#152A52] text-white">
               <Plus className="h-4 w-4" />
               New user
             </Button>
@@ -174,7 +174,9 @@ function UsersPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Create user</Button>
+                <Button type="submit" className="bg-[#1E3B70] hover:bg-[#152A52] text-white">
+                  Create user
+                </Button>
               </DialogFooter>
             </form>
             {showCreateInfo ? (
