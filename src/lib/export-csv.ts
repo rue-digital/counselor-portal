@@ -1,31 +1,36 @@
 // src/lib/export-csv.ts
 
-export function exportTicketsToCSV(tickets: Record<string, any>[], filename = "requests_export.csv") {
+import { Ticket } from "./types";
+
+export function exportTicketsToCSV(
+  tickets: Record<string, Ticket>[],
+  filename = "requests_export.csv",
+) {
   if (!tickets || tickets.length === 0) return;
 
   // Define headers from keys or custom list
   const headers = [
-    "ID",
     "Family Code",
+    "Urgent",
     "School",
     "Assistance Types",
     "Assistance Reasons",
-    "Priority",
-    "Status",
+    "Context",
     "Youth in Family",
+    "Status",
     "Created At",
   ];
 
   // Map each ticket object to a CSV formatted row
   const rows = tickets.map((t) => [
-    t.id ?? "",
     `"${t.family_reference_code || ""}"`, // Wrap in quotes to avoid comma splitting
+    String(t.urgent_need),
     `"${t.school_name || ""}"`,
     `"${(t.assistance_types || []).join(", ")}"`,
     `"${(t.assistance_reasons || []).join(", ")}"`,
-    t.priority ?? "",
-    t.status ?? "",
+    `"${t.assistance_context}"`,
     t.youth_in_family ?? 0,
+    t.status ?? "",
     t.created_at ?? "",
   ]);
 
