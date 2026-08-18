@@ -60,20 +60,14 @@ function LoginPage() {
       <header className="w-full bg-white border-b border-border/40 py-6 px-8 min-h-[72px] shadow-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Top banner content placeholder */}
-        {/* Left: DARN Logo & Subtitle */}
+          {/* Left: DARN Logo & Subtitle */}
           <div className="flex items-center gap-3">
-            <img 
-              src={darnLogo} 
-              alt="" 
-              className="h-10 w-10 object-contain rounded-full" 
-            />
+            <img src={darnLogo} alt="" className="h-10 w-10 object-contain rounded-full" />
             <div className="flex flex-col">
               <span className="font-bold text-lg text-[#1E3B70] leading-tight tracking-tight">
                 DARN
               </span>
-              <span className="text-[11px] text-muted-foreground leading-none">
-                Bexley, Ohio
-              </span>
+              <span className="text-[11px] text-muted-foreground leading-none">Bexley, Ohio</span>
             </div>
           </div>
 
@@ -97,14 +91,10 @@ function LoginPage() {
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <Card className="w-full max-w-lg p-2 shadow-sm">
           <CardHeader className="space-y-3">
-            <img 
-              src={login} 
-              alt="" 
-              className="h-10 w-10 object-contain" 
-            />
+            <img src={login} alt="" className="h-10 w-10 object-contain" />
             <div>
               <CardTitle className="text-2xl font-bold tracking-tight text-[#1e293b]">
-                Sign In to Your Account
+                Sign in to your account
               </CardTitle>
             </div>
           </CardHeader>
@@ -132,8 +122,8 @@ function LoginPage() {
                   required
                 />
               </div>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full bg-[#1E3B70] hover:bg-[#152A52] text-white font-medium py-2.5 rounded-md transition-colors"
               >
                 Login
