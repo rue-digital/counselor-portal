@@ -10,6 +10,7 @@ import {
   Users,
   LogOut,
   LifeBuoy,
+  Settings,
 } from "lucide-react";
 import { signOut } from "@/lib/auth.server";
 import darnLogo from "@/components/ui/darn-logo.jpg";
@@ -53,11 +54,7 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
     <div className="flex min-h-screen w-full bg-muted/30">
       <aside className="hidden md:flex w-64 flex-col border-r border-[#152A52] bg-[#1E3B70] text-white">
         <div className="flex items-center gap-2 px-6 py-5 border-b border-white/15">
-          <img 
-              src={darnLogo} 
-              alt="" 
-              className="h-10 w-10 object-contain rounded-full" 
-            />
+          <img src={darnLogo} alt="" className="h-10 w-10 object-contain rounded-full" />
           <div>
             <div className="text-sm font-semibold text-white">DARN Portal</div>
             <div className="text-xs text-white/70 capitalize">{role} portal</div>
@@ -85,6 +82,18 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
           })}
         </nav>
         <div className="border-t border-white/15 p-3 space-y-1">
+          <Link
+            to="/settings"
+            className={cn(
+              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              pathname === "/settings"
+                ? "bg-white text-[#1E3B70] [&>svg]:text-[#1E3B70]"
+                : "text-white/80 [&>svg]:text-white hover:bg-white/10 hover:text-white",
+            )}
+          >
+            <Settings className="h-4 w-4" />
+            Settings
+          </Link>
           <button
             className="w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm text-white/80 [&>svg]:text-white hover:bg-white/10 hover:text-white hover:cursor-pointer transition-colors"
             onClick={handleSignOut}
@@ -98,7 +107,7 @@ export function PortalShell({ children, role, title, subtitle, actions }: Portal
         <header className="border-b bg-card">
           <div className="flex items-start justify-between gap-4 px-6 py-5">
             <div>
-             <h1 className="text-xl font-semibold tracking-tight text-[#1E3B70]">{title}</h1>
+              <h1 className="text-xl font-semibold tracking-tight text-[#1E3B70]">{title}</h1>
               {subtitle ? <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p> : null}
             </div>
             {actions ? <div className="flex items-center gap-2">{actions}</div> : null}

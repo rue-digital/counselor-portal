@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LifeBuoy } from "lucide-react";
 import { getLoggedInUserProfile, signIn } from "@/lib/auth.server";
+import { isPasswordRecovery } from "@/lib/password-recovery";
 import { toast } from "sonner";
 import { redirect } from "@tanstack/react-router";
 import darnLogo from "@/components/ui/darn-logo.jpg";
@@ -13,6 +14,10 @@ import login from "@/components/ui/login.svg";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
+    if (isPasswordRecovery()) {
+      throw redirect({ to: "/reset-password" });
+    }
+
     const profile = await getLoggedInUserProfile();
     if (profile) {
       throw redirect({ to: profile.role == "admin" ? "/admin" : "/dashboard" });
@@ -122,11 +127,16 @@ function LoginPage() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                >
+                  Forgot password?
+                </Link>
               </div>
               <Button
                 type="submit"
