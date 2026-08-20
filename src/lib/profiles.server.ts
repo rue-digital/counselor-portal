@@ -2,6 +2,27 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { createServerFn } from "@tanstack/react-start";
 import { CreatedUser } from "./types";
 
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export async function sendWelcomeEmail(userEmail: string, tempPassword: string) {
+  const { data, error } = await resend.emails.send({
+    from: 'onboarding@resend.dev',
+    to: [userEmail],
+    subject: 'Welcome! Your Account Details',
+    html: `<p>Your account has been created.</p>
+           <p>Your temporary password is: <strong>${tempPassword}</strong></p>
+           <p>Please log in and change this immediately.</p>`,
+  });
+
+  if (error) {
+    console.error('Failed to send email:', error);
+    return null;
+  }
+  return data;
+}
+
 export const getAllUsers = createServerFn({ method: "GET" }).handler(async () => {
   const { createClient } = await import("./supabase/supabase.server");
   const supabase = createClient();
@@ -45,6 +66,8 @@ export const createUser = createServerFn({ method: "POST" })
     );
 
     if (error || !createUser) return;
+await sendWelcomeEmail(data.email, data.password);
+
     return createUser;
   });
 
