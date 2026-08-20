@@ -1,6 +1,23 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { createServerFn } from "@tanstack/react-start";
 import { CreatedUser } from "./types";
+import { Resend } from "resend";
+
+export async function sendWelcomeEmail(userEmail: string, tempPassword: string) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  const { data, error } = await resend.emails.send({
+    from: "DARN Portal Onboarding <onboarding@portal.bexleydarn.org>",
+    to: [userEmail],
+    subject: "Welcome! Your Account Details",
+    html: `<p>Your account has been created.</p>
+           <p>Your temporary password is: <strong>${tempPassword}</strong></p>
+           <p>Please log in and change this immediately.</p>`,
+  });
+
+  if (error) throw error;
+  return data;
+}
 
 export const getAllUsers = createServerFn({ method: "GET" }).handler(async () => {
   const { createClient } = await import("./supabase/supabase.server");
@@ -45,6 +62,9 @@ export const createUser = createServerFn({ method: "POST" })
     );
 
     if (error || !createUser) return;
+
+    await sendWelcomeEmail(data.email, data.password);
+
     return createUser;
   });
 
@@ -70,7 +90,6 @@ export function generatePassword(length = 16) {
   for (let i = 0; i < length; i++) {
     password += charset[randomValues[i] % charset.length];
   }
-  // all passwords are developforgood for ease of testing
-  return "developforgood";
+
   return password;
 }

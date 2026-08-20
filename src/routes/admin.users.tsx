@@ -200,7 +200,8 @@ function UsersPage() {
                       <br />
                       <b>Password:</b> {createdUser?.password}
                       <br />
-                      An email has been sent to the new user with their login credentials.
+                      If the email exists, an email has been sent to the new user with their login
+                      credentials.
                     </p>
                   </div>
                 </DialogContent>

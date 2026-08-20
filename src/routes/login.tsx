@@ -35,7 +35,7 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("developforgood");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -116,7 +116,6 @@ function LoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your school email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
